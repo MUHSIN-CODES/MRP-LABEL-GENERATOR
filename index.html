@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Label Generator</title>
+    <title>MRP Label Generator</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -11,23 +11,30 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
     <style>
+        
+        /* General body and page layout styles */
         body {
             margin: 0;
             padding: 20px;
             background: #ffffff;
             font-family: Arial, sans-serif;
         }
-
-        .main-page {
+        .page {
+            display: none;
             text-align: center;
             margin-bottom: 20px;
         }
-
-        .generator-page {
-            display: none;
+        .page.active {
+            display: block;
+        }
+        .generator-header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 5rem;
+            background-color: #06005c;
         }
 
-        /* Container for all action buttons */
+        /* Button styles */
         .button-row {
             display: flex;
             justify-content: center;
@@ -36,182 +43,53 @@
             margin-bottom: 10px;
             gap: 10px;
         }
-
-        /* Styles for the CF MRP and BT MRP buttons */
-        #cfBtn, #btBtn {
-            margin-top: 10px ;
-            margin-bottom: 10px;
+        .btn-custom {
             padding: 10px 20px;
             font-size: 14px;
             cursor: pointer;
-            background-color: rgb(0, 24, 118);
-            color: #ffffff;
             border: 2px solid white;
             border-radius: 25px;
+            color: #ffffff;
         }
-
-        #cfBtn:hover, #btBtn:hover {
+        .btn-primary-custom {
+            background-color: rgb(0, 24, 118);
+        }
+        .btn-primary-custom:hover {
             background-color: rgb(0, 14, 72);
         }
-
-        .custom-file-upload {
-            padding: 10px 20px;
+        .btn-accent-custom {
             background-color: rgb(107, 107, 255);
-            color: #ffffff;
-            border: 2px solid white;
-            border-radius: 25px;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: center;
         }
-
-        .custom-file-upload:hover {
+        .btn-accent-custom:hover {
             background-color: rgb(77, 77, 255);
         }
-        
+        .btn-warning-custom {
+            background-color: rgb(235, 255, 53);
+            color: black;
+        }
+        .btn-warning-custom:hover {
+            background-color: rgb(229, 255, 0);
+        }
+        .btn-dark-custom {
+            background-color: rgb(77, 77, 77);
+        }
+        .btn-dark-custom:hover {
+            background-color: rgb(0, 0, 0);
+        }
+        .btn-success-custom {
+            background-color: rgb(24, 155, 0);
+        }
+        .btn-success-custom:hover {
+            background-color: rgb(16, 107, 0);
+        }
+
+        /* File hint and error box styles */
         .file-hint {
             display: block;
             text-align: center;
             font-size: x-small;
             color: rgba(128, 128, 128, 0.836);
         }
-
-        .action-btn1 {
-            padding: 10px 20px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: rgb(235, 255, 53);
-            color: black;
-            border: 2px solid white;
-            border-radius: 25px;
-        }
-
-        .action-btn1:hover {
-            background-color: rgb(229, 255, 0);
-        }
-        
-        .action-btn2 {
-            display: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: rgb(77, 77, 77);
-            color: #ffffff;
-            border: 2px solid white;
-            border-radius: 25px;
-        }
-
-        .action-btn2:hover {
-            background-color: rgb(0, 0, 0);
-        }
-        
-        .action-btn3 {
-            display: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: rgb(255, 73, 73);
-            color: #ffffff;
-            border: 2px solid white;
-            border-radius: 25px;
-        }
-
-        .action-btn3:hover {
-            background-color: rgb(255, 52, 52);
-        }
-
-        .label {
-            width: 1.58in;
-            height: 2.36in;
-            padding: 0.07in;
-            margin-bottom: 5px;
-            margin-right: 1px;
-            background: #ffffff;
-            border-radius: 0.15in;
-            box-sizing: border-box;
-            font-size: 7px;
-            line-height: 1.1;
-            overflow: hidden;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            vertical-align: top;
-            position: relative;
-            border: 1px solid #00000057;
-            text-align: left;
-        }
-
-        .label-content {
-            width: 100%;
-        }
-
-        .bold {
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .section {
-            font-size: 8px;
-            margin-bottom: 2px;
-            font-weight: 800;
-        }
-
-        .section1 {
-            margin-bottom: 2px;
-            font-size: 8px;
-        }
-        
-        /* Updated style for the line with BATCH and FIT */
-        .batch-fit-line {
-            display: flex;
-            justify-content: space-between;
-            font-size: 8px;
-            font-weight: 800;
-            margin-bottom: 2px;
-            padding-left: 0;
-            padding-right: 0;
-            text-transform: uppercase;
-        }
-
-        .barcode-container {
-            text-align: center;
-        }
-
-        .barcode {
-            width: 85%;
-            height: 22.5px;
-        }
-
-        .mrp {
-            font-size: 15px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 3px;
-        }
-
-        .mrp small {
-            display: block;
-            font-weight: normal;
-            font-size: 8px;
-        }
-        
-        .vcode-circle {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 22px;
-            height: 22px;
-            background: rgba(255, 255, 255, 0);
-            color: black;
-            font-weight: bolder;
-            font-size: 8px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 22px;
-            z-index: 10;
-            border: none;
-        }
-
         .inline-error-box {
             display: none;
             border: 1px solid #f5c2c7;
@@ -225,19 +103,19 @@
             position: relative;
             text-align: left;
         }
-
+        .inline-error-box .close-btn, .inline-error-box .ok-btn {
+            cursor: pointer;
+            border: none;
+        }
         .inline-error-box .close-btn {
             position: absolute;
             top: 8px;
             right: 12px;
             font-weight: bold;
-            cursor: pointer;
             color: #842029;
             background: none;
-            border: none;
             font-size: 18px;
         }
-
         .inline-error-box .ok-btn {
             display: block;
             margin: 15px auto 5px auto;
@@ -246,97 +124,406 @@
             font-weight: bold;
             background-color: #842029;
             color: white;
-            border: none;
             border-radius: 5px;
-            cursor: pointer;
         }
 
+        /* New card-container styles to match the image */
+        .card-container {
+            background-color: white;
+            padding:0.05in;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            display: inline-block;
+            vertical-align: top;
+            margin: 2px;
+        }
+
+        /* Specific styles for portrait labels */
+        .portrait-label .label-container {
+            width: 1.58in;
+            height: 2.36in;
+            padding: 0.025in;
+            background: #ffffff;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            font-size: 6px;
+            line-height: 1.1;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.148);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+        }
+
+        /* Specific styles for landscape labels */
+        .landscape-label .label-container {
+            width: 2.36in;
+            height: 1.58in;
+            padding: 0.07in;
+            background: #ffffff;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            font-size: 6px;
+            line-height: 1.1;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.148);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+        }
+
+        /* Style for content rotation */
+        .label-content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .landscape-label .label-content-wrapper {
+            transform: rotate(-90deg);
+            width: 1.58in;
+            height: 2.36in;
+            box-sizing: border-box;
+            padding: 0.025in;
+        }
+
+        /* Main content container */
+        .label-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            text-align: left;
+            padding: 0.1in;
+            /* padding: 0.05in 0.025in 0.025in 0.05in; */
+            line-height: 1.1;
+            font-size: 6px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        /* Other content styling */
+        .label-bold {
+            font-weight: normal;
+        }
+        .data-bold {
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .color-bold {
+            font-size: 8px;
+            font-weight: bold;
+        }
+        .mrp .data-bold {
+            font-size: 15px;
+        }
+        .section{
+            font-size: 7px;
+            margin-bottom: 1px;
+            font-weight: normal;
+        }
+        .section.style {
+            font-size: 7px;
+        }
+        .section.desc {
+            font-size: 6.5px;
+        }
+        .section.size {
+            font-size: 7px;
+        }
+        .section1 {
+            font-size: 7px;
+            margin-bottom: 1px;
+            /* font-weight: normal; */
+        }
+        .section2 {
+            font-size: 7px;
+            margin-bottom: 1px;
+            font-weight: normal;
+        }
+        .cb{
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .batch-fit-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        .barcode-container {
+            text-align: center;
+            margin: 1px 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .barcode {
+            width: 90%;
+            height: 20px;
+            max-width: 100%;
+        }
+        .mrp {
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 3px;
+        }
+        .mrp small {
+            display: block;
+            font-weight: normal;
+            font-size: 7px;
+        }
+        
+        /* New class for centering text */
+        .center-text {
+            text-align: center;
+        }
+
+        /* Corrected VCODE positioning for all labels */
+        .vcode-circle {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 22px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0);
+            color: black;
+            font-weight: bolder;
+            font-size: 7px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            z-index: 10;
+            border: none;
+        }
+        /* Landscape VCODE should not be rotated, as per user's request. */
+        .landscape-label .label-content-wrapper .vcode-circle {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            /* transform: rotate(90deg); - Removed as per user request */
+        }
+        
+        /* Print-specific styles */
         @media print {
-            .import-btn-row,
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .page:not(.print-active) {
+                display: none !important;
+            }
             .button-row,
             .file-hint,
             .inline-error-box,
             .generator-header {
                 display: none !important;
             }
+
+            /* Container for labels during print */
+            .label-container {
+                padding: 0;
+                justify-content: flex-start;
+                align-items: flex-start;
+                align-content: flex-start;
+            }
+            
+            /* --- Corrected Print Modes for PDF Printing --- */
+            .pdf-print-mode .card-container {
+                margin: 0;
+                page-break-inside: avoid;
+                padding: 0.05in;
+                border-radius: 0.15in;
+                box-sizing: border-box;
+                display: inline-block;
+                vertical-align: top;
+            }
+            .pdf-print-mode.portrait-print-mode {
+                @page {
+                    size: 1.68in 2.46in;
+                    margin: 0;
+                }
+            }
+            .pdf-print-mode.landscape-print-mode {
+                @page {
+                    size: 2.46in 1.68in;
+                    margin: 0;
+                }
+            }
+
+            /* --- Corrected Print Modes for TSC DA220 Printing --- */
+            .tsc-print-mode .card-container {
+                /* No styling needed for TSC, so we override to ensure it's a clean label */
+                margin: 0;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+                background-color: transparent;
+                page-break-inside: avoid;
+            }
+            .tsc-print-mode.portrait-print-mode {
+                @page {
+                    size: 1.68in 2.46in;
+                    margin: 0;
+                }
+            }
+            .tsc-print-mode.landscape-print-mode {
+                @page {
+                    size: 2.46in 1.68in;
+                    margin: 0;
+                }
+            }
+            
+            /* Ensure the labels are the only thing being printed */
+            body > *:not(.print-active) {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="main-page" class="main-page">
-        <h1 class="text-center text-light mb-5" style="background-color: #06005c;">MRP LABEL GENERATOR</h1>
-        <button id="cfBtn" class="btn btn-primary">CF MRP</button>
-        <button id="btBtn" class="btn btn-secondary">BT MRP</button>
+    <div id="main-page" class="page active">
+        <h1 class="generator-header">MRP LABEL GENERATOR</h1>
+        <div class="button-row">
+            <button id="cfBtn" class="btn-custom btn-primary-custom">CF MRP</button>
+            <button id="btBtn" class="btn-custom btn-primary-custom">BT MRP</button>
+        </div>
     </div>
 
-    <div id="cfmrp" class="generator-page">
-        <h1 id="headCF" class="generator-header text-center text-light mb-5" style="background-color: #06005c;"></h1>
-        
-        <div class="button-row import-row">
-            <button id="mainPageBtnCF" class="action-btn1">Main Page</button>
-            <label for="excelFileCF" class="custom-file-upload">Import</label>
-            <button id="backBtnCF" class="action-btn2">Back</button>
-            <button id="printBtnCF" class="action-btn3">Print</button>
+    <div id="cfmrp-import-page" class="page">
+        <h1 class="generator-header">CF MRP - Import Data</h1>
+        <div class="button-row">
+            <label for="excelFileCF" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+            <input type="file" id="excelFileCF" accept=".xlsx, .xls, .csv" style="display: none;" />
+            <button id="goToMainPageCF" class="btn-custom btn-warning-custom">Main Page</button>
         </div>
-        <input type="file" id="excelFileCF" accept=".xlsx, .xls, .csv" style="display: none;" />
-        <small class="file-hint file-hint-cf" style="display:block;text-align:center; font-size: x-small; color: rgba(128, 128, 128, 0.836);">File Format: CSV or XLS or XLSX</small>
-
+        <small class="file-hint file-hint-cf">File Format: CSV or XLS or XLSX</small>
         <div id="inlineErrorBoxCF" class="inline-error-box">
-            <button class="close-btn" onclick="document.getElementById('inlineErrorBoxCF').style.display = 'none';">×</button>
-            <div id="inlineErrorMessageCF">Error message here</div>
-            <button class="ok-btn" onclick="document.getElementById('inlineErrorBoxCF').style.display = 'none';">OK</button>
+            <button class="close-btn">×</button>
+            <div id="inlineErrorMessageCF"></div>
+            <button class="ok-btn">OK</button>
         </div>
-        
-        <div id="label-containerCF"></div>
     </div>
 
-    <div id="btmrp" class="generator-page">
-        <h1 id="headBT" class="generator-header text-center text-light mb-5" style="background-color: #06005c;"></h1>
-
-        <div class="button-row import-row">
-            <button id="mainPageBtnBT" class="action-btn1">Main Page</button>
-            <label for="excelFileBT" class="custom-file-upload">Import</label>
-            <button id="backBtnBT" class="action-btn2">Back</button>
-            <button id="printBtnBT" class="action-btn3">Print</button>
+    <div id="cfmrp-label-type-page" class="page">
+        <h1 class="generator-header">CF MRP - Select Label Type</h1>
+        <div class="button-row">
+            <button id="portraitLabelBtnCF" class="btn-custom btn-success-custom">Portrait Labels</button>
+            <button id="landscapeLabelBtnCF" class="btn-custom btn-success-custom">Landscape Labels</button>
+            <button id="backToImportPageCF" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageCF_fromType" class="btn-custom btn-warning-custom">Main Page</button>
         </div>
-        <input type="file" id="excelFileBT" accept=".xlsx, .xls, .csv" style="display: none;" />
-        <small class="file-hint file-hint-bt" style="display:block;text-align:center; font-size: x-small; color: rgba(128, 128, 128, 0.836);">File Format: CSV or XLS or XLSX</small>
+    </div>
 
+    <div id="cfmrp-portrait-preview-page" class="page">
+        <h1 class="generator-header">CF MRP - Portrait Preview</h1>
+        <div class="button-row">
+            <button id="printPortraitPdfBtnCF" class="btn-custom btn-success-custom">Print to PDF</button>
+            <button id="printPortraitTscBtnCF" class="btn-custom btn-success-custom">Print to STICKER</button>
+            <button id="backToTypeBtnCF_Portrait" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageCF_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+        <div id="portrait-containerCF" class="label-container"></div>
+    </div>
+
+    <div id="cfmrp-landscape-preview-page" class="page">
+        <h1 class="generator-header">CF MRP - Landscape Preview</h1>
+        <div class="button-row">
+            <button id="printLandscapePdfBtnCF" class="btn-custom btn-success-custom">Print to PDF</button>
+            <button id="printLandscapeTscBtnCF" class="btn-custom btn-success-custom">Print to STICKER</button>
+            <button id="backToTypeBtnCF_Landscape" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageCF_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+        <div id="landscape-containerCF" class="label-container"></div>
+    </div>
+
+    <div id="btmrp-import-page" class="page">
+        <h1 class="generator-header">BT MRP - Import Data</h1>
+        <div class="button-row">
+            <label for="excelFileBT" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+            <input type="file" id="excelFileBT" accept=".xlsx, .xls, .csv" style="display: none;" />
+            <button id="goToMainPageBT" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+        <small class="file-hint file-hint-bt">File Format: CSV or XLS or XLSX</small>
         <div id="inlineErrorBoxBT" class="inline-error-box">
-            <button class="close-btn" onclick="document.getElementById('inlineErrorBoxBT').style.display = 'none';">×</button>
-            <div id="inlineErrorMessageBT">Error message here</div>
-            <button class="ok-btn" onclick="document.getElementById('inlineErrorBoxBT').style.display = 'none';">OK</button>
+            <button class="close-btn">×</button>
+            <div id="inlineErrorMessageBT"></div>
+            <button class="ok-btn">OK</button>
         </div>
-        
-        <div id="label-containerBT"></div>
+    </div>
+
+    <div id="btmrp-label-type-page" class="page">
+        <h1 class="generator-header">BT MRP - Select Label Type</h1>
+        <div class="button-row">
+            <button id="portraitLabelBtnBT" class="btn-custom btn-success-custom">Portrait Labels</button>
+            <button id="landscapeLabelBtnBT" class="btn-custom btn-success-custom">Landscape Labels</button>
+            <button id="backToImportPageBT" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageBT_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+    </div>
+
+    <div id="btmrp-portrait-preview-page" class="page">
+        <h1 class="generator-header">BT MRP - Portrait Preview</h1>
+        <div class="button-row">
+            <button id="printPortraitPdfBtnBT" class="btn-custom btn-success-custom">Print to PDF</button>
+            <button id="printPortraitTscBtnBT" class="btn-custom btn-success-custom">Print to STICKER</button>
+            <button id="backToTypeBtnBT_Portrait" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageBT_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+        <div id="portrait-containerBT" class="label-container"></div>
+    </div>
+
+    <div id="btmrp-landscape-preview-page" class="page">
+        <h1 class="generator-header">BT MRP - Landscape Preview</h1>
+        <div class="button-row">
+            <button id="printLandscapePdfBtnBT" class="btn-custom btn-success-custom">Print to PDF</button>
+            <button id="printLandscapeTscBtnBT" class="btn-custom btn-success-custom">Print to STICKER</button>
+            <button id="backToTypeBtnBT_Landscape" class="btn-custom btn-dark-custom">Back</button>
+            <button id="goToMainPageBT_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+        </div>
+        <div id="landscape-containerBT" class="label-container"></div>
     </div>
 
     <template id="label-template">
-        <div class="label">
-            <div class="vcode-circle"></div>
-            <div class="label-content">
-                <div class="section style"></div>
-                <div class="section color"></div>
-                <div class="section desc"></div>
-                <div class="section size"></div>
-                <div class="section qty"></div>
-                <div class="section pkd"></div>
-                <div class="batch-fit-line">
-                    <span class="fit"></span>
-                    <span class="batch"></span>
+        <div class="card-container">
+            <div class="label-container">
+                <div class="label-content-wrapper">
+                    <div class="label-content">
+                        <div class="vcode-circle">VCODE</div>
+                        <div class="section style "><span class="label-bold">STYLE CODE</span><span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section color "><span class="label-bold">COLOR</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section desc "><span class="label-bold">DESCRIPTION</span><span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section size "><span class="label-bold">SIZE</span>⠀⠀⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section qty "><span class="label-bold">NET QTY</span>⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section pkd "><span class="label-bold">PKD DATE</span>⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="batch-fit-line">
+                            <span class="fit"></span>
+                            <span class="batch"></span>
+                        </div>
+                        <div class="barcode-container">
+                            <svg class="barcode"></svg>
+                        </div>
+                        <div class="section1">
+                            <span class="label-bold">Marketed By:</span><br>
+                            <span class="address-content"></span>
+                        </div>
+                        <div class="section1" style="margin-top: 1px;">
+                            For customer complaints<br>
+                            <span class="contact-content"></span>
+                        </div>
+                        <div class="mrp">MRP ₹ 0.00<small>(Inclusive of all taxes)</small></div>
+                    </div>
                 </div>
-                <div class="barcode-container">
-                    <svg class="barcode"></svg>
-                </div>
-                <div class="section1">
-                    <span>Marketed By:</span><br>
-                    <span class="address-content"></span>
-                </div>
-                <div class="section1" style="margin-top: 1px;">
-                    For customer complaints<br>
-                    <span class="contact-content"></span>
-                </div>
-                <div class="mrp">MRP ₹ 0.00<small>(Inclusive of all taxes)</small></div>
             </div>
         </div>
     </template>
@@ -344,7 +531,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Template Data Object
             const LABEL_TEMPLATES = {
                 CF: {
                     title: "CF MRP LABEL GENERATOR",
@@ -376,59 +562,128 @@
                 }
             };
 
-            const mainPage = document.getElementById('main-page');
-            const cfGeneratorPage = document.getElementById('cfmrp');
-            const btGeneratorPage = document.getElementById('btmrp');
+            const pageElements = {
+                main: document.getElementById('main-page'),
+                cfImport: document.getElementById('cfmrp-import-page'),
+                btImport: document.getElementById('btmrp-import-page'),
+                cfLabelType: document.getElementById('cfmrp-label-type-page'),
+                btLabelType: document.getElementById('btmrp-label-type-page'),
+                cfPortraitPreview: document.getElementById('cfmrp-portrait-preview-page'),
+                btPortraitPreview: document.getElementById('btmrp-portrait-preview-page'),
+                cfLandscapePreview: document.getElementById('cfmrp-landscape-preview-page'),
+                btLandscapePreview: document.getElementById('btmrp-landscape-preview-page'),
+            };
 
-            function showPage(pageId, prefix) {
-                mainPage.style.display = 'none';
-                cfGeneratorPage.style.display = 'none';
-                btGeneratorPage.style.display = 'none';
-                
-                const page = document.getElementById(pageId);
-                if (page) {
-                    page.style.display = 'block';
-                    if (prefix) {
-                        const templateData = LABEL_TEMPLATES[prefix];
-                        document.getElementById('head' + prefix).textContent = templateData.title;
-                    }
+            let currentLabelsData = [];
+            let currentPrefix = '';
+
+            function showPage(pageElement) {
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                if (pageElement) {
+                    pageElement.classList.add('active');
+                } else {
+                    console.error("Page element not found.");
                 }
             }
 
-            document.getElementById('cfBtn').addEventListener('click', () => showPage('cfmrp', 'CF'));
-            document.getElementById('btBtn').addEventListener('click', () => showPage('btmrp', 'BT'));
-
-            function setupLabelGenerator(prefix, templateData) {
+            function clearPageData(prefix) {
                 const fileInput = document.getElementById('excelFile' + prefix);
-                const importLabel = document.querySelector(`label[for="excelFile${prefix}"]`);
-                const fileHint = document.querySelector(`.file-hint-${prefix.toLowerCase()}`);
-                const printBtn = document.getElementById('printBtn' + prefix);
-                const backBtn = document.getElementById('backBtn' + prefix);
-                const labelContainer = document.getElementById('label-container' + prefix);
-                const errorBox = document.getElementById('inlineErrorBox' + prefix);
-                const errorMessage = document.getElementById('inlineErrorMessage' + prefix);
-                const mainPageBtn = document.getElementById('mainPageBtn' + prefix);
-
-                mainPageBtn.addEventListener('click', () => {
+                if (fileInput) {
                     fileInput.value = '';
-                    labelContainer.innerHTML = '';
-                    hideInlineError();
-                    showPage('main-page');
+                }
+                const portraitContainer = document.getElementById('portrait-container' + prefix);
+                if (portraitContainer) {
+                    portraitContainer.innerHTML = '';
+                }
+                const landscapeContainer = document.getElementById('landscape-container' + prefix);
+                if (landscapeContainer) {
+                    landscapeContainer.innerHTML = '';
+                }
+                hideInlineError(prefix);
+                currentLabelsData = [];
+            }
+
+            function showInlineError(prefix, message) {
+                const currentErrorBox = document.getElementById('inlineErrorBox' + prefix);
+                const currentErrorMessage = document.getElementById('inlineErrorMessage' + prefix);
+                if (currentErrorBox && currentErrorMessage) {
+                    currentErrorMessage.innerHTML = message;
+                    currentErrorBox.style.display = 'block';
+                    currentErrorBox.querySelector('.close-btn').addEventListener('click', () => hideInlineError(prefix), { once: true });
+                    currentErrorBox.querySelector('.ok-btn').addEventListener('click', () => hideInlineError(prefix), { once: true });
+                }
+            }
+            function hideInlineError(prefix) {
+                const currentErrorBox = document.getElementById('inlineErrorBox' + prefix);
+                if (currentErrorBox) {
+                    currentErrorBox.style.display = 'none';
+                }
+            }
+
+            document.getElementById('cfBtn').addEventListener('click', () => {
+                currentPrefix = 'CF';
+                showPage(pageElements.cfImport);
+            });
+            document.getElementById('btBtn').addEventListener('click', () => {
+                currentPrefix = 'BT';
+                showPage(pageElements.btImport);
+            });
+
+            document.getElementById('goToMainPageCF').addEventListener('click', () => {
+                clearPageData('CF');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageCF_fromType').addEventListener('click', () => {
+                clearPageData('CF');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageCF_fromPortrait').addEventListener('click', () => {
+                clearPageData('CF');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageCF_fromLandscape').addEventListener('click', () => {
+                clearPageData('CF');
+                showPage(pageElements.main);
+            });
+
+            document.getElementById('goToMainPageBT').addEventListener('click', () => {
+                clearPageData('BT');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageBT_fromType').addEventListener('click', () => {
+                clearPageData('BT');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageBT_fromPortrait').addEventListener('click', () => {
+                clearPageData('BT');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageBT_fromLandscape').addEventListener('click', () => {
+                clearPageData('BT');
+                showPage(pageElements.main);
+            });
+
+
+            ['CF', 'BT'].forEach(prefix => {
+                const fileInput = document.getElementById('excelFile' + prefix);
+                const portraitContainer = document.getElementById('portrait-container' + prefix);
+                const landscapeContainer = document.getElementById('landscape-container' + prefix);
+                const templateData = LABEL_TEMPLATES[prefix];
+                
+                document.getElementById(`backToImportPage${prefix}`).addEventListener('click', () => {
+                    showPage(pageElements[`${prefix.toLowerCase()}Import`]);
+                });
+                document.getElementById(`backToTypeBtn${prefix}_Portrait`).addEventListener('click', () => {
+                    showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
+                });
+                document.getElementById(`backToTypeBtn${prefix}_Landscape`).addEventListener('click', () => {
+                    showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
                 });
 
-
-                function showInlineError(message) {
-                    errorMessage.innerHTML = message;
-                    errorBox.style.display = 'block';
-                }
-
-                function hideInlineError() {
-                    errorMessage.innerHTML = '';
-                    errorBox.style.display = 'none';
-                }
-
                 fileInput.addEventListener('change', function (e) {
-                    hideInlineError();
+                    hideInlineError(prefix);
                     const file = e.target.files[0];
                     if (!file) return;
 
@@ -437,15 +692,10 @@
                     const isValid = allowedTypes.some(ext => fileName.endsWith(ext));
 
                     if (!isValid) {
-                        showInlineError("❌ Invalid file type.<br>Please upload a .xlsx, .xls, or .csv file.");
+                        showInlineError(prefix, "❌ Invalid file type.<br>Please upload a .xlsx, .xls, or .csv file.");
                         e.target.value = '';
                         return;
                     }
-
-                    importLabel.style.display = 'none';
-                    fileHint.style.display = 'none';
-                    printBtn.style.display = 'block';
-                    backBtn.style.display = 'block';
                     
                     const reader = new FileReader();
                     reader.onload = function (event) {
@@ -464,10 +714,7 @@
                         
                         const missingHeaders = templateData.headers.filter(h => !upperCaseHeaders.includes(h));
                         const extraHeaders = upperCaseHeaders.filter(h => !templateData.headers.includes(h));
-                        
-                        // Check for headers that are not in uppercase
                         const lowerCaseIssues = rawHeaders.filter(h => h !== h.toUpperCase() && templateData.headers.includes(h.toUpperCase()));
-
 
                         if (missingHeaders.length > 0 || extraHeaders.length > 0 || lowerCaseIssues.length > 0) {
                             let msg = "❌ <b>Header validation failed!</b><br><br>";
@@ -482,17 +729,13 @@
                                 msg += "⚠️ <b>Headers must be in UPPERCASE:</b> " + lowerCaseIssues.join(", ") + "<br>";
                             }
                             
-                            showInlineError(msg);
-                            fileInput.value = '';
-                            importLabel.style.display = 'block';
-                            fileHint.style.display = 'block';
-                            printBtn.style.display = 'none';
-                            backBtn.style.display = 'none';
+                            showInlineError(prefix, msg);
+                            e.target.value = '';
                             return;
                         }
 
-                        const dataObjects = XLSX.utils.sheet_to_json(sheet);
-                        generateLabels(dataObjects, labelContainer, templateData);
+                        currentLabelsData = XLSX.utils.sheet_to_json(sheet);
+                        showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
                     };
 
                     if (fileName.endsWith('.csv')) {
@@ -502,14 +745,24 @@
                     }
                 });
 
-                function generateLabels(dataArray, container, templateData) {
+                function generateLabels(dataArray, container, templateData, labelClass) {
                     const template = document.getElementById('label-template');
                     container.innerHTML = '';
 
                     dataArray.forEach(data => {
                         const qty = parseInt(data['QTY'] || 1, 10);
                         for (let i = 0; i < qty; i++) {
-                            const label = template.content.cloneNode(true);
+                            const label = template.content.cloneNode(true).firstElementChild;
+                            label.classList.add(labelClass);
+                            
+                            const labelContentWrapper = label.querySelector('.label-content-wrapper');
+                            const labelContent = label.querySelector('.label-content');
+                            
+                            if (labelClass === 'landscape-label') {
+                                labelContentWrapper.classList.add('rotate-90-left');
+                            } else {
+                                labelContentWrapper.classList.remove('rotate-90-left');
+                            }
                             
                             const fields = [
                                 { className: 'style', label: 'STYLE CODE', key: 'STYLE CODE' },
@@ -522,23 +775,28 @@
                             fields.forEach(f => {
                                 const el = label.querySelector(`.${f.className}`);
                                 let val = data[f.key];
+                                const labelText = el.querySelector('.label-bold');
+                                const dataText = el.querySelector('.data-bold');
                                 if (val !== undefined && val !== null && String(val).trim() !== '') {
                                     if (f.className === 'color' && String(val).trim().length > 17) {
                                         const colors = String(val).trim().split('/');
                                         const first = colors[0]?.trim() || '';
                                         const second = colors[1] ? '/' + colors[1].trim() : '';
-                                        val = `<span class="bold">${f.label}</span> : ${first}` +
-                                            (second ? `<br><span style="padding-left: 35px;">${second}</span>` : '');
+                                        labelText.textContent = f.label;
+                                        el.innerHTML = `<span class="label-bold">${f.label}</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="color-bold">${first}</span>` +
+                                            (second ? `<br><span class="color-bold" style="padding-left: 30px;">⠀⠀⠀⠀${second}</span>` : '');
                                     } else {
-                                        val = `<span class="bold">${f.label}</span> : ${val}`;
+                                        labelText.textContent = f.label;
+                                        dataText.textContent = val;
                                     }
-                                    el.innerHTML = val;
                                 } else {
                                     el.remove();
                                 }
                             });
 
                             const pkdEl = label.querySelector('.pkd');
+                            const pkdLabel = pkdEl.querySelector('.label-bold');
+                            const pkdData = pkdEl.querySelector('.data-bold');
                             let rawDate = data['PKD'];
                             let formattedDate = '';
                             if (typeof rawDate === 'number') {
@@ -556,7 +814,8 @@
                                     formattedDate = rawDate || '';
                                 }
                             }
-                            pkdEl.innerHTML = `<span class="bold">PKD DATE</span> : ${formattedDate}`;
+                            pkdLabel.textContent = "PKD DATE";
+                            pkdData.textContent = formattedDate;
                             
                             const batchFitLine = label.querySelector('.batch-fit-line');
                             const batchSpan = label.querySelector('.batch');
@@ -569,13 +828,11 @@
                             } else {
                                 fitSpan.remove();
                             }
-
                             if (batchVal) {
                                 batchSpan.textContent = batchVal;
                             } else {
                                 batchSpan.remove();
                             }
-                            
                             if (!batchVal && !fitVal) {
                                 batchFitLine.remove();
                             }
@@ -586,7 +843,7 @@
                                 JsBarcode(barcode, rawBarcode, {
                                     format: "CODE128",
                                     width: 1,
-                                    height: 10,
+                                    height: 9,
                                     fontSize: 10,
                                     textMargin: 0,
                                     margin: 0,
@@ -596,41 +853,59 @@
                             }, 0);
 
                             const mrp = label.querySelector('.mrp');
-                            mrp.innerHTML = `MRP ₹ ${data['MRP'] || '0.00'}<small>(Inclusive of all taxes)</small>`;
-
+                            mrp.innerHTML = `MRP ₹ <span class="data-bold">${data['MRP'] || '0.00'}</span><small>(Inclusive of all taxes)</small>`;
+                            
                             const vcodeCircle = label.querySelector('.vcode-circle');
                             if (vcodeCircle) {
                                 vcodeCircle.textContent = data['VCODE'] || '';
                             }
-
+                            
                             const addressEl = label.querySelector('.address-content');
                             if (addressEl) addressEl.innerHTML = templateData.address.join("<br>");
                             
                             const contactEl = label.querySelector('.contact-content');
                             if (contactEl) contactEl.textContent = templateData.contact;
-
+                            
                             container.appendChild(label);
                         }
                     });
                 }
 
-                backBtn.addEventListener('click', () => {
-                    fileInput.value = '';
-                    importLabel.style.display = 'block';
-                    fileHint.style.display = 'block';
-                    printBtn.style.display = 'none';
-                    backBtn.style.display = 'none';
-                    labelContainer.innerHTML = '';
-                    hideInlineError();
+                document.getElementById(`portraitLabelBtn${prefix}`).addEventListener('click', () => {
+                    generateLabels(currentLabelsData, portraitContainer, templateData, 'portrait-label');
+                    showPage(pageElements[`${prefix.toLowerCase()}PortraitPreview`]);
                 });
 
-                printBtn.addEventListener('click', () => {
+                document.getElementById(`landscapeLabelBtn${prefix}`).addEventListener('click', () => {
+                    generateLabels(currentLabelsData, landscapeContainer, templateData, 'landscape-label');
+                    showPage(pageElements[`${prefix.toLowerCase()}LandscapePreview`]);
+                });
+                
+                document.getElementById(`printPortraitPdfBtn${prefix}`).addEventListener('click', () => {
+                    const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-portrait-preview-page`);
+                    currentPreviewPage.classList.add('pdf-print-mode', 'portrait-print-mode', 'print-active');
                     window.print();
+                    currentPreviewPage.classList.remove('pdf-print-mode', 'portrait-print-mode', 'print-active');
                 });
-            }
-
-            setupLabelGenerator('CF', LABEL_TEMPLATES.CF);
-            setupLabelGenerator('BT', LABEL_TEMPLATES.BT);
+                document.getElementById(`printPortraitTscBtn${prefix}`).addEventListener('click', () => {
+                    const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-portrait-preview-page`);
+                    currentPreviewPage.classList.add('tsc-print-mode', 'portrait-print-mode', 'print-active');
+                    window.print();
+                    currentPreviewPage.classList.remove('tsc-print-mode', 'portrait-print-mode', 'print-active');
+                });
+                document.getElementById(`printLandscapePdfBtn${prefix}`).addEventListener('click', () => {
+                    const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-landscape-preview-page`);
+                    currentPreviewPage.classList.add('pdf-print-mode', 'landscape-print-mode', 'print-active');
+                    window.print();
+                    currentPreviewPage.classList.remove('pdf-print-mode', 'landscape-print-mode', 'print-active');
+                });
+                document.getElementById(`printLandscapeTscBtn${prefix}`).addEventListener('click', () => {
+                    const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-landscape-preview-page`);
+                    currentPreviewPage.classList.add('tsc-print-mode', 'landscape-print-mode', 'print-active');
+                    window.print();
+                    currentPreviewPage.classList.remove('tsc-print-mode', 'landscape-print-mode', 'print-active');
+                });
+            });
         });
     </script>
 </body>
