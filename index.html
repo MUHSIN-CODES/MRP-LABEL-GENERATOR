@@ -12,7 +12,6 @@
 
     <style>
         
-        /* General body and page layout styles */
         body {
             margin: 0;
             padding: 20px;
@@ -34,7 +33,6 @@
             background-color: #06005c;
         }
 
-        /* Button styles */
         .button-row {
             display: flex;
             justify-content: center;
@@ -83,7 +81,6 @@
             background-color: rgb(16, 107, 0);
         }
 
-        /* File hint and error box styles */
         .file-hint {
             display: block;
             text-align: center;
@@ -127,7 +124,6 @@
             border-radius: 5px;
         }
 
-        /* New card-container styles to match the image */
         .card-container {
             background-color: white;
             padding:0.05in;
@@ -138,7 +134,6 @@
             margin: 2px;
         }
 
-        /* Specific styles for portrait labels */
         .portrait-label .label-container {
             width: 1.58in;
             height: 2.36in;
@@ -156,7 +151,6 @@
             text-align: left;
         }
 
-        /* Specific styles for landscape labels */
         .landscape-label .label-container {
             width: 2.36in;
             height: 1.58in;
@@ -174,7 +168,6 @@
             text-align: left;
         }
 
-        /* Style for content rotation */
         .label-content-wrapper {
             width: 100%;
             height: 100%;
@@ -190,7 +183,6 @@
             padding: 0.025in;
         }
 
-        /* Main content container */
         .label-content {
             display: flex;
             flex-direction: column;
@@ -198,7 +190,6 @@
             box-sizing: border-box;
             text-align: left;
             padding: 0.1in;
-            /* padding: 0.05in 0.025in 0.025in 0.05in; */
             line-height: 1.1;
             font-size: 6px;
             width: 100%;
@@ -206,7 +197,6 @@
             position: relative;
         }
         
-        /* Other content styling */
         .label-bold {
             font-weight: normal;
         }
@@ -238,7 +228,6 @@
         .section1 {
             font-size: 7px;
             margin-bottom: 1px;
-            /* font-weight: normal; */
         }
         .section2 {
             font-size: 7px;
@@ -282,12 +271,10 @@
             font-size: 7px;
         }
         
-        /* New class for centering text */
         .center-text {
             text-align: center;
         }
 
-        /* Corrected VCODE positioning for all labels */
         .vcode-circle {
             position: absolute;
             bottom: 5px;
@@ -304,15 +291,12 @@
             z-index: 10;
             border: none;
         }
-        /* Landscape VCODE should not be rotated, as per user's request. */
         .landscape-label .label-content-wrapper .vcode-circle {
             position: absolute;
             bottom: 5px;
             right: 5px;
-            /* transform: rotate(90deg); - Removed as per user request */
         }
         
-        /* Print-specific styles */
         @media print {
             body {
                 margin: 0;
@@ -330,7 +314,6 @@
                 display: none !important;
             }
 
-            /* Container for labels during print */
             .label-container {
                 padding: 0;
                 justify-content: flex-start;
@@ -338,7 +321,6 @@
                 align-content: flex-start;
             }
             
-            /* --- Corrected Print Modes for PDF Printing --- */
             .pdf-print-mode .card-container {
                 margin: 0;
                 page-break-inside: avoid;
@@ -361,9 +343,7 @@
                 }
             }
 
-            /* --- Corrected Print Modes for TSC DA220 Printing --- */
             .tsc-print-mode .card-container {
-                /* No styling needed for TSC, so we override to ensure it's a clean label */
                 margin: 0;
                 padding: 0;
                 border-radius: 0;
@@ -384,7 +364,6 @@
                 }
             }
             
-            /* Ensure the labels are the only thing being printed */
             body > *:not(.print-active) {
                 display: none;
             }
@@ -502,7 +481,10 @@
                         <div class="vcode-circle">VCODE</div>
                         <div class="section style "><span class="label-bold">STYLE CODE</span><span class="cb"> : </span><span class="data-bold"></span></div>
                         <div class="section color "><span class="label-bold">COLOR</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="section desc "><span class="label-bold">DESCRIPTION</span><span class="cb"> : </span><span class="data-bold"></span></div>
+                        <div class="section desc ">
+                            <span class="label-bold">DESCRIPTION</span><span class="cb"> : </span>
+                            <span class="data-bold" style="white-space: pre-wrap; word-wrap: break-word;"></span>
+                        </div>
                         <div class="section size "><span class="label-bold">SIZE</span>⠀⠀⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
                         <div class="section qty "><span class="label-bold">NET QTY</span>⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
                         <div class="section pkd "><span class="label-bold">PKD DATE</span>⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
@@ -774,25 +756,46 @@
 
                             fields.forEach(f => {
                                 const el = label.querySelector(`.${f.className}`);
+                                if (!el) return;
                                 let val = data[f.key];
                                 const labelText = el.querySelector('.label-bold');
                                 const dataText = el.querySelector('.data-bold');
+
                                 if (val !== undefined && val !== null && String(val).trim() !== '') {
-                                    if (f.className === 'color' && String(val).trim().length > 17) {
+                                    if (f.className === 'color' && String(val).trim().length > 16) {
                                         const colors = String(val).trim().split('/');
                                         const first = colors[0]?.trim() || '';
                                         const second = colors[1] ? '/' + colors[1].trim() : '';
                                         labelText.textContent = f.label;
                                         el.innerHTML = `<span class="label-bold">${f.label}</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="color-bold">${first}</span>` +
                                             (second ? `<br><span class="color-bold" style="padding-left: 30px;">⠀⠀⠀⠀${second}</span>` : '');
+                                    } else if (f.className === 'desc') {
+                                        labelText.textContent = f.label;
+                                        if (dataText) {
+                                            dataText.textContent = val;
+                                            if (String(val).length > 16) {
+                                            dataText.style.fontSize = '6px';
+                                            } else if (String(val).length > 15) {
+                                            dataText.style.fontSize = '6.5px';
+                                            } else if (String(val).length > 14) {
+                                            dataText.style.fontSize = '7px';
+                                            } else if (String(val).length > 13) {
+                                            dataText.style.fontSize = '7.25px';
+                                        } else {
+                                            dataText.style.fontSize = '8px';
+                                        }
+                                    }
                                     } else {
                                         labelText.textContent = f.label;
-                                        dataText.textContent = val;
+                                        if (dataText) {
+                                            dataText.textContent = val;
+                                        }
                                     }
                                 } else {
                                     el.remove();
                                 }
                             });
+
 
                             const pkdEl = label.querySelector('.pkd');
                             const pkdLabel = pkdEl.querySelector('.label-bold');
