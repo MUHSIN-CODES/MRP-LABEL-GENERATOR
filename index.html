@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>MRP Label Generator</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
@@ -14,7 +12,6 @@
         
         body {
             margin: 0;
-            padding: 20px;
             background: #ffffff;
             font-family: Arial, sans-serif;
         }
@@ -29,8 +26,14 @@
         .generator-header {
             text-align: center;
             color: #fff;
-            margin-bottom: 5rem;
             background-color: #06005c;
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            background-color: transparent;
+            z-index: 1000;
         }
 
         .button-row {
@@ -38,7 +41,7 @@
             justify-content: center;
             align-items: center;
             margin-top: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             gap: 10px;
         }
         .btn-custom {
@@ -150,6 +153,9 @@
             align-items: center;
             text-align: left;
         }
+        .portrait-label.no-border .label-container {
+             border: none;
+        }
 
         .landscape-label .label-container {
             width: 2.36in;
@@ -166,6 +172,9 @@
             justify-content: center;
             align-items: center;
             text-align: left;
+        }
+         .landscape-label.no-border .label-container {
+             border: none;
         }
 
         .label-content-wrapper {
@@ -186,10 +195,11 @@
         .label-content {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
             box-sizing: border-box;
             text-align: left;
-            padding: 0.1in;
+            padding: 0.05in;
             line-height: 1.1;
             font-size: 6px;
             width: 100%;
@@ -237,6 +247,9 @@
         .cb{
             font-size: 10px;
             font-weight: bold;
+            padding-left: 0;
+            padding-right: 0;
+            width: 5px;
         }
         .batch-fit-line {
             display: flex;
@@ -276,11 +289,6 @@
         }
 
         .vcode-circle {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 22px;
-            height: 22px;
             background: rgba(255, 255, 255, 0);
             color: black;
             font-weight: bolder;
@@ -291,12 +299,47 @@
             z-index: 10;
             border: none;
         }
-        .landscape-label .label-content-wrapper .vcode-circle {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .label-content table tr td {
+            border: 1px solid black;
+            text-align: left;
+            background-color: white;
         }
         
+        .label-content table.no-border tr td {
+            border: none;
+        }
+        
+        .label-content table tr td:first-child {
+            font-weight: normal;
+        }
+
+        .label-content table tr td:nth-child(3) {
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+        
+        .vcode-column {
+            width: 22px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .btn-custom {
+                font-size: 10px;
+            }
+        }
         @media print {
             body {
                 margin: 0;
@@ -310,7 +353,8 @@
             .button-row,
             .file-hint,
             .inline-error-box,
-            .generator-header {
+            .generator-header,
+            .sticky-top {
                 display: none !important;
             }
 
@@ -368,23 +412,68 @@
                 display: none;
             }
         }
+        
+        .barcode-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 9px;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        
+        .barcode-section .barcode-text {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .barcode-section .fit-data,
+        .barcode-section .batch-data {
+            font-weight: bold;
+            font-size: 9px;
+        }
+        
+        .barcode-section .fit-data {
+            text-align: left;
+        }
+        
+        .barcode-section .batch-data {
+            text-align: right;
+        }
+
+        .sticky-footer-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background-color: #06005c;
+            z-index: 999;
+        }
+        
     </style>
 </head>
 <body>
     <div id="main-page" class="page active">
-        <h1 class="generator-header">MRP LABEL GENERATOR</h1>
-        <div class="button-row">
-            <button id="cfBtn" class="btn-custom btn-primary-custom">CF MRP</button>
-            <button id="btBtn" class="btn-custom btn-primary-custom">BT MRP</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">MRP LABEL GENERATOR</h1>
+            <div class="button-row">
+                <button id="cfBtn" class="btn-custom btn-primary-custom">CF MRP</button>
+                <button id="btBtn" class="btn-custom btn-primary-custom">BT MRP</button>
+            </div>
         </div>
     </div>
 
     <div id="cfmrp-import-page" class="page">
-        <h1 class="generator-header">CF MRP - Import Data</h1>
-        <div class="button-row">
-            <label for="excelFileCF" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
-            <input type="file" id="excelFileCF" accept=".xlsx, .xls, .csv" style="display: none;" />
-            <button id="goToMainPageCF" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Import Data</h1>
+            <div class="button-row">
+                <label for="excelFileCF" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+                <input type="file" id="excelFileCF" accept=".xlsx, .xls, .csv" style="display: none;" />
+                <button id="goToMainPageCF" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <small class="file-hint file-hint-cf">File Format: CSV or XLS or XLSX</small>
         <div id="inlineErrorBoxCF" class="inline-error-box">
@@ -395,43 +484,63 @@
     </div>
 
     <div id="cfmrp-label-type-page" class="page">
-        <h1 class="generator-header">CF MRP - Select Label Type</h1>
-        <div class="button-row">
-            <button id="portraitLabelBtnCF" class="btn-custom btn-success-custom">Portrait Labels</button>
-            <button id="landscapeLabelBtnCF" class="btn-custom btn-success-custom">Landscape Labels</button>
-            <button id="backToImportPageCF" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageCF_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Select Label Type</h1>
+            <div class="button-row">
+                <button id="portraitLabelBtnCF" class="btn-custom btn-success-custom">Portrait Labels</button>
+                <button id="landscapeLabelBtnCF" class="btn-custom btn-success-custom">Landscape Labels</button>
+                <button id="backToImportPageCF" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="cfmrp-print-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Select Print Type</h1>
+            <div class="button-row">
+                <button id="printWithBorderBtnCF" class="btn-custom btn-success-custom">With Border</button>
+                <button id="printWithoutBorderBtnCF" class="btn-custom btn-success-custom">Without Border</button>
+                <button id="backToLabelTypePageCF" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromPrintType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
     </div>
 
     <div id="cfmrp-portrait-preview-page" class="page">
-        <h1 class="generator-header">CF MRP - Portrait Preview</h1>
-        <div class="button-row">
-            <button id="printPortraitPdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
-            <button id="printPortraitTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
-            <button id="backToTypeBtnCF_Portrait" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageCF_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Portrait Preview</h1>
+            <div class="button-row">
+                <button id="printPortraitPdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printPortraitTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnCF_Portrait" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <div id="portrait-containerCF" class="label-container"></div>
     </div>
 
     <div id="cfmrp-landscape-preview-page" class="page">
-        <h1 class="generator-header">CF MRP - Landscape Preview</h1>
-        <div class="button-row">
-            <button id="printLandscapePdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
-            <button id="printLandscapeTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
-            <button id="backToTypeBtnCF_Landscape" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageCF_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Landscape Preview</h1>
+            <div class="button-row">
+                <button id="printLandscapePdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printLandscapeTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnCF_Landscape" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <div id="landscape-containerCF" class="label-container"></div>
     </div>
 
     <div id="btmrp-import-page" class="page">
-        <h1 class="generator-header">BT MRP - Import Data</h1>
-        <div class="button-row">
-            <label for="excelFileBT" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
-            <input type="file" id="excelFileBT" accept=".xlsx, .xls, .csv" style="display: none;" />
-            <button id="goToMainPageBT" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Import Data</h1>
+            <div class="button-row">
+                <label for="excelFileBT" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+                <input type="file" id="excelFileBT" accept=".xlsx, .xls, .csv" style="display: none;" />
+                <button id="goToMainPageBT" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <small class="file-hint file-hint-bt">File Format: CSV or XLS or XLSX</small>
         <div id="inlineErrorBoxBT" class="inline-error-box">
@@ -442,73 +551,214 @@
     </div>
 
     <div id="btmrp-label-type-page" class="page">
-        <h1 class="generator-header">BT MRP - Select Label Type</h1>
-        <div class="button-row">
-            <button id="portraitLabelBtnBT" class="btn-custom btn-success-custom">Portrait Labels</button>
-            <button id="landscapeLabelBtnBT" class="btn-custom btn-success-custom">Landscape Labels</button>
-            <button id="backToImportPageBT" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageBT_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Select Label Type</h1>
+            <div class="button-row">
+                <button id="portraitLabelBtnBT" class="btn-custom btn-success-custom">Portrait Labels</button>
+                <button id="landscapeLabelBtnBT" class="btn-custom btn-success-custom">Landscape Labels</button>
+                <button id="backToImportPageBT" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="btmrp-print-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Select Print Type</h1>
+            <div class="button-row">
+                <button id="printWithBorderBtnBT" class="btn-custom btn-success-custom">With Border</button>
+                <button id="printWithoutBorderBtnBT" class="btn-custom btn-success-custom">Without Border</button>
+                <button id="backToLabelTypePageBT" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromPrintType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
     </div>
 
     <div id="btmrp-portrait-preview-page" class="page">
-        <h1 class="generator-header">BT MRP - Portrait Preview</h1>
-        <div class="button-row">
-            <button id="printPortraitPdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
-            <button id="printPortraitTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
-            <button id="backToTypeBtnBT_Portrait" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageBT_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Portrait Preview</h1>
+            <div class="button-row">
+                <button id="printPortraitPdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printPortraitTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnBT_Portrait" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <div id="portrait-containerBT" class="label-container"></div>
     </div>
 
     <div id="btmrp-landscape-preview-page" class="page">
-        <h1 class="generator-header">BT MRP - Landscape Preview</h1>
-        <div class="button-row">
-            <button id="printLandscapePdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
-            <button id="printLandscapeTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
-            <button id="backToTypeBtnBT_Landscape" class="btn-custom btn-dark-custom">Back</button>
-            <button id="goToMainPageBT_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Landscape Preview</h1>
+            <div class="button-row">
+                <button id="printLandscapePdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printLandscapeTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnBT_Landscape" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
         </div>
         <div id="landscape-containerBT" class="label-container"></div>
     </div>
 
     <template id="label-template">
-        <div class="card-container">
-            <div class="label-container">
-                <div class="label-content-wrapper">
-                    <div class="label-content">
-                        <div class="vcode-circle">VCODE</div>
-                        <div class="section style "><span class="label-bold">STYLE CODE</span><span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="section color "><span class="label-bold">COLOR</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="section desc ">
-                            <span class="label-bold">DESCRIPTION</span><span class="cb"> : </span>
-                            <span class="data-bold" style="white-space: pre-wrap; word-wrap: break-word;"></span>
-                        </div>
-                        <div class="section size "><span class="label-bold">SIZE</span>⠀⠀⠀⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="section qty "><span class="label-bold">NET QTY</span>⠀⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="section pkd "><span class="label-bold">PKD DATE</span>⠀⠀<span class="cb"> : </span><span class="data-bold"></span></div>
-                        <div class="batch-fit-line">
-                            <span class="fit"></span>
-                            <span class="batch"></span>
-                        </div>
-                        <div class="barcode-container">
-                            <svg class="barcode"></svg>
-                        </div>
-                        <div class="section1">
-                            <span style="font-weight: bold;">Marketed By:</span><br>
-                            <span class="address-content"></span>
-                        </div>
-                        <div class="section1" style="margin-top: 1px;">
-                            For customer complaints<br>
-                            <span class="contact-content"></span>
-                        </div>
-                        <div class="mrp">MRP ₹ 0.00<small>(Inclusive of all taxes)</small></div>
-                    </div>
+    <div class="card-container">
+        <div class="label-container">
+            <div class="label-content-wrapper">
+                <div class="label-content">
+                    
+                    <table style="width:100%; border-collapse: collapse;" >
+                        <tr class="section style">
+                            <td class="label-bold" style="width: 30%;">STYLE CODE</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section color">
+                            <td class="label-bold" style="width: 30%;">COLOR</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section desc">
+                            <td class="label-bold" style="width: 30%;">DESCRIPTION</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section size">
+                            <td class="label-bold" style="width: 30%;">SIZE</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section qty">
+                            <td class="label-bold" style="width: 30%;">NET QTY</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section pkd">
+                            <td class="label-bold" style="width: 30%;">PKD DATE</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        
+                        <tr class="section fit-batch">
+                            <td class="data-bold fit-data" colspan="2" style="font-weight:bold; text-align:left;"></td>
+                            <td class="data-bold batch-data" colspan="2" style="font-weight:bold; text-align:right;"></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="3">
+                                <div class="barcode-container">
+                                    <svg class="barcode"></svg>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="3">
+                                <div class="section1">
+                                    <span style="font-weight: bold;">Marketed By:</span><br>
+                                    <span class="address-content"></span>
+                                </div>
+                                <div class="section1" style="margin-top: 1px;">
+                                    For customer complaints<br>
+                                    <span class="contact-content"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="2" class="mrp-cell" style=" text-align: center;">
+                                <div class="mrp">MRP ₹ 0.00 <small>(Inclusive of all taxes)</small></div>
+                            </td>
+                            <td class="vcode-column">
+                                <div class="vcode-circle">VCODE</div>
+                            </td>
+                        </tr>
+
+                    </table>
+
                 </div>
             </div>
         </div>
+    </div>
     </template>
+
+    <template id="label-template-no-border">
+    <div class="card-container">
+        <div class="label-container no-border">
+            <div class="label-content-wrapper">
+                <div class="label-content">
+                    
+                    <table style="width:100%; border-collapse: collapse;" class="no-border">
+                        <tr class="section style">
+                            <td class="label-bold" style="width: 30%;">STYLE CODE</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section color">
+                            <td class="label-bold" style="width: 30%;">COLOR</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section desc">
+                            <td class="label-bold" style="width: 30%;">DESCRIPTION</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section size">
+                            <td class="label-bold" style="width: 30%;">SIZE</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section qty">
+                            <td class="label-bold" style="width: 30%;">NET QTY</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        <tr class="section pkd">
+                            <td class="label-bold" style="width: 30%;">PKD DATE</td>
+                            <td class="cb">:</td>
+                            <td class="data-bold" colspan="2"></td>
+                        </tr>
+                        
+                        <tr class="section fit-batch">
+                            <td class="data-bold fit-data" colspan="2" style="font-weight:bold; text-align:left;"></td>
+                            <td class="data-bold batch-data" colspan="2" style="font-weight:bold; text-align:right;"></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div class="barcode-container">
+                                    <svg class="barcode"></svg>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="3">
+                                <div class="section1">
+                                    <span style="font-weight: bold;">Marketed By:</span><br>
+                                    <span class="address-content"></span>
+                                </div>
+                                <div class="section1" style="margin-top: 1px;">
+                                    For customer complaints<br>
+                                    <span class="contact-content"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="3" class="mrp-cell" style=" text-align: center;">
+                                <div class="mrp">MRP ₹ 0.00 <small>(Inclusive of all taxes)</small></div>
+                            </td>
+                            <td class="vcode-column">
+                                <div class="vcode-circle">VCODE</div>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="sticky-footer-container">
+    <p class="text-center text-light">Developed By <span style="font-size: small;">Muhsin Puliyakodan</span></p>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -550,6 +800,8 @@
                 btImport: document.getElementById('btmrp-import-page'),
                 cfLabelType: document.getElementById('cfmrp-label-type-page'),
                 btLabelType: document.getElementById('btmrp-label-type-page'),
+                cfPrintType: document.getElementById('cfmrp-print-type-page'),
+                btPrintType: document.getElementById('btmrp-print-type-page'),
                 cfPortraitPreview: document.getElementById('cfmrp-portrait-preview-page'),
                 btPortraitPreview: document.getElementById('btmrp-portrait-preview-page'),
                 cfLandscapePreview: document.getElementById('cfmrp-landscape-preview-page'),
@@ -558,6 +810,7 @@
 
             let currentLabelsData = [];
             let currentPrefix = '';
+            let currentLabelOrientation = '';
 
             function showPage(pageElement) {
                 document.querySelectorAll('.page').forEach(page => {
@@ -621,6 +874,10 @@
                 clearPageData('CF');
                 showPage(pageElements.main);
             });
+            document.getElementById('goToMainPageCF_fromPrintType').addEventListener('click', () => {
+                clearPageData('CF');
+                showPage(pageElements.main);
+            });
             document.getElementById('goToMainPageCF_fromPortrait').addEventListener('click', () => {
                 clearPageData('CF');
                 showPage(pageElements.main);
@@ -635,6 +892,10 @@
                 showPage(pageElements.main);
             });
             document.getElementById('goToMainPageBT_fromType').addEventListener('click', () => {
+                clearPageData('BT');
+                showPage(pageElements.main);
+            });
+            document.getElementById('goToMainPageBT_fromPrintType').addEventListener('click', () => {
                 clearPageData('BT');
                 showPage(pageElements.main);
             });
@@ -657,11 +918,40 @@
                 document.getElementById(`backToImportPage${prefix}`).addEventListener('click', () => {
                     showPage(pageElements[`${prefix.toLowerCase()}Import`]);
                 });
-                document.getElementById(`backToTypeBtn${prefix}_Portrait`).addEventListener('click', () => {
+                document.getElementById(`backToLabelTypePage${prefix}`).addEventListener('click', () => {
                     showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
                 });
+                document.getElementById(`backToTypeBtn${prefix}_Portrait`).addEventListener('click', () => {
+                    showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+                });
                 document.getElementById(`backToTypeBtn${prefix}_Landscape`).addEventListener('click', () => {
-                    showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
+                    showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+                });
+                
+                document.getElementById(`portraitLabelBtn${prefix}`).addEventListener('click', () => {
+                    currentLabelOrientation = 'portrait';
+                    showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+                });
+
+                document.getElementById(`landscapeLabelBtn${prefix}`).addEventListener('click', () => {
+                    currentLabelOrientation = 'landscape';
+                    showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+                });
+
+                document.getElementById(`printWithBorderBtn${prefix}`).addEventListener('click', () => {
+                    const templateName = 'label-template';
+                    const container = currentLabelOrientation === 'portrait' ? portraitContainer : landscapeContainer;
+                    const page = currentLabelOrientation === 'portrait' ? pageElements[`${prefix.toLowerCase()}PortraitPreview`] : pageElements[`${prefix.toLowerCase()}LandscapePreview`];
+                    generateLabels(currentLabelsData, container, templateData, `${currentLabelOrientation}-label`, templateName);
+                    showPage(page);
+                });
+
+                document.getElementById(`printWithoutBorderBtn${prefix}`).addEventListener('click', () => {
+                    const templateName = 'label-template-no-border';
+                    const container = currentLabelOrientation === 'portrait' ? portraitContainer : landscapeContainer;
+                    const page = currentLabelOrientation === 'portrait' ? pageElements[`${prefix.toLowerCase()}PortraitPreview`] : pageElements[`${prefix.toLowerCase()}LandscapePreview`];
+                    generateLabels(currentLabelsData, container, templateData, `${currentLabelOrientation}-label`, templateName);
+                    showPage(page);
                 });
 
                 fileInput.addEventListener('change', function (e) {
@@ -727,8 +1017,8 @@
                     }
                 });
 
-                function generateLabels(dataArray, container, templateData, labelClass) {
-                    const template = document.getElementById('label-template');
+                function generateLabels(dataArray, container, templateData, labelClass, templateId) {
+                    const template = document.getElementById(templateId);
                     container.innerHTML = '';
 
                     dataArray.forEach(data => {
@@ -737,8 +1027,13 @@
                             const label = template.content.cloneNode(true).firstElementChild;
                             label.classList.add(labelClass);
                             
+                            if (templateId === 'label-template-no-border') {
+                                label.querySelector('.label-container').classList.add('no-border');
+                            } else {
+                                label.querySelector('.label-container').classList.remove('no-border');
+                            }
+                            
                             const labelContentWrapper = label.querySelector('.label-content-wrapper');
-                            const labelContent = label.querySelector('.label-content');
                             
                             if (labelClass === 'landscape-label') {
                                 labelContentWrapper.classList.add('rotate-90-left');
@@ -747,116 +1042,158 @@
                             }
                             
                             const fields = [
-                                { className: 'style', label: 'STYLE CODE', key: 'STYLE CODE' },
-                                { className: 'color', label: 'COLOR', key: 'COLOR' },
-                                { className: 'desc', label: 'DESCRIPTION', key: 'DESCRIPTION' },
-                                { className: 'size', label: 'SIZE', key: 'SIZE' },
-                                { className: 'qty', label: 'NET QTY', key: 'NOS' }
+                                { className: 'style', key: 'STYLE CODE' },
+                                { className: 'color', key: 'COLOR' },
+                                { className: 'desc', key: 'DESCRIPTION' },
+                                { className: 'size', key: 'SIZE' },
+                                { className: 'qty', key: 'NOS' },
+                                { className: 'pkd', key: 'PKD' }
                             ];
-
+                            
                             fields.forEach(f => {
                                 const el = label.querySelector(`.${f.className}`);
                                 if (!el) return;
                                 let val = data[f.key];
-                                const labelText = el.querySelector('.label-bold');
                                 const dataText = el.querySelector('.data-bold');
-
+                                
                                 if (val !== undefined && val !== null && String(val).trim() !== '') {
-                                    if (f.className === 'color' && String(val).trim().length > 16) {
-                                        const colors = String(val).trim().split('/');
-                                        const first = colors[0]?.trim() || '';
-                                        const second = colors[1] ? '/' + colors[1].trim() : '';
-                                        labelText.textContent = f.label;
-                                        el.innerHTML = `<span class="label-bold">${f.label}</span>⠀⠀⠀⠀<span class="cb"> : </span><span class="color-bold">${first}</span>` +
-                                            (second ? `<br><span class="color-bold" style="padding-left: 30px;">⠀⠀⠀⠀${second}</span>` : '');
-                                    } else if (f.className === 'desc') {
-                                        labelText.textContent = f.label;
-                                        if (dataText) {
-                                            dataText.textContent = val;
-                                            if (String(val).length > 16) {
-                                            dataText.style.fontSize = '6px';
-                                            } else if (String(val).length > 15) {
-                                            dataText.style.fontSize = '6.5px';
-                                            } else if (String(val).length > 14) {
-                                            dataText.style.fontSize = '7px';
-                                            } else if (String(val).length > 13) {
-                                            dataText.style.fontSize = '7.25px';
+                                    if (f.className === 'color') {
+                                        const colorStr = String(val).trim();
+                                        if (colorStr.length > 14) {
+                                            const firstSlashIndex = colorStr.indexOf('/');
+                                            const firstUnderscoreIndex = colorStr.indexOf('_');
+                                            
+                                            let firstDelimiterIndex = -1;
+                                            
+                                            if (firstSlashIndex !== -1 && (firstUnderscoreIndex === -1 || firstSlashIndex < firstUnderscoreIndex)) {
+                                                firstDelimiterIndex = firstSlashIndex;
+                                            } else if (firstUnderscoreIndex !== -1) {
+                                                firstDelimiterIndex = firstUnderscoreIndex;
+                                            }
+                                            
+                                            let secondDelimiterIndex = -1;
+                                            if (firstDelimiterIndex !== -1) {
+                                                const secondSlashIndex = colorStr.indexOf('/', firstDelimiterIndex + 1);
+                                                const secondUnderscoreIndex = colorStr.indexOf('_', firstDelimiterIndex + 1);
+                                                
+                                                if (secondSlashIndex !== -1 && (secondUnderscoreIndex === -1 || secondSlashIndex < secondUnderscoreIndex)) {
+                                                    secondDelimiterIndex = secondSlashIndex;
+                                                } else if (secondUnderscoreIndex !== -1) {
+                                                    secondDelimiterIndex = secondUnderscoreIndex;
+                                                }
+                                            }
+                                            
+                                            if (firstDelimiterIndex !== -1 && secondDelimiterIndex === -1) {
+                                                const first = colorStr.substring(0, firstDelimiterIndex)?.trim() || '';
+                                                const second = colorStr.substring(firstDelimiterIndex).trim() || '';
+                                                if (dataText) {
+                                                    dataText.innerHTML = `<span class="color-bold">${first}</span><br><span class="color-bold">${second}</span>`;
+                                                }
+                                            } else if (secondDelimiterIndex !== -1) {
+                                                const first = colorStr.substring(0, secondDelimiterIndex)?.trim() || '';
+                                                const second = colorStr.substring(secondDelimiterIndex).trim() || '';
+                                                if (dataText) {
+                                                    dataText.innerHTML = `<span class="color-bold">${first}</span><br><span class="color-bold">${second}</span>`;
+                                                }
+                                            } else {
+                                                if (dataText) {
+                                                    dataText.textContent = val;
+                                                }
+                                            }
                                         } else {
-                                            dataText.style.fontSize = '8px';
+                                            if (dataText) {
+                                                dataText.textContent = val;
+                                            }
                                         }
-                                    }
+                                    } else if (f.key === 'PKD') {
+                                        let formattedDate = '';
+                                        if (typeof val === 'number') {
+                                            const excelEpoch = new Date(1899, 11, 30);
+                                            const parsedDate = new Date(excelEpoch.getTime() + val * 86400000);
+                                            formattedDate = `${String(parsedDate.getMonth() + 1).padStart(2, '0')}/${parsedDate.getFullYear()}`;
+                                        } else if (typeof val === 'string' && /^\d{1,2}\/\d{4}$/.test(val.trim())) {
+                                            const [month, year] = val.split('/');
+                                            formattedDate = `${month.padStart(2, '0')}/${year}`;
+                                        } else {
+                                            const parsed = new Date(val);
+                                            if (!isNaN(parsed)) {
+                                                formattedDate = `${String(parsed.getMonth() + 1).padStart(2, '0')}/${parsed.getFullYear()}`;
+                                            } else {
+                                                formattedDate = val || '';
+                                            }
+                                        }
+                                        dataText.textContent = formattedDate;
                                     } else {
-                                        labelText.textContent = f.label;
-                                        if (dataText) {
-                                            dataText.textContent = val;
+                                        dataText.textContent = val;
+                                        if (f.key === 'DESCRIPTION') {
+                                            if (String(val).length > 16) {
+                                                dataText.style.fontSize = '6px';
+                                            } else if (String(val).length > 15) {
+                                                dataText.style.fontSize = '6.5px';
+                                            } else if (String(val).length > 14) {
+                                                dataText.style.fontSize = '7px';
+                                            } else if (String(val).length > 13) {
+                                                dataText.style.fontSize = '7.25px';
+                                            } else {
+                                                dataText.style.fontSize = '8px';
+                                            }
                                         }
                                     }
                                 } else {
                                     el.remove();
                                 }
                             });
-
-
-                            const pkdEl = label.querySelector('.pkd');
-                            const pkdLabel = pkdEl.querySelector('.label-bold');
-                            const pkdData = pkdEl.querySelector('.data-bold');
-                            let rawDate = data['PKD'];
-                            let formattedDate = '';
-                            if (typeof rawDate === 'number') {
-                                const excelEpoch = new Date(1899, 11, 30);
-                                const parsedDate = new Date(excelEpoch.getTime() + rawDate * 86400000);
-                                formattedDate = `${String(parsedDate.getMonth() + 1).padStart(2, '0')}/${parsedDate.getFullYear()}`;
-                            } else if (typeof rawDate === 'string' && /^\d{1,2}\/\d{4}$/.test(rawDate.trim())) {
-                                const [month, year] = rawDate.split('/');
-                                formattedDate = `${month.padStart(2, '0')}/${year}`;
-                            } else {
-                                const parsed = new Date(rawDate);
-                                if (!isNaN(parsed)) {
-                                    formattedDate = `${String(parsed.getMonth() + 1).padStart(2, '0')}/${parsed.getFullYear()}`;
-                                } else {
-                                    formattedDate = rawDate || '';
-                                }
-                            }
-                            pkdLabel.textContent = "PKD DATE";
-                            pkdData.textContent = formattedDate;
                             
-                            const batchFitLine = label.querySelector('.batch-fit-line');
-                            const batchSpan = label.querySelector('.batch');
-                            const fitSpan = label.querySelector('.fit');
-                            const batchVal = data['BATCH'];
+                            const fitBatchRow = label.querySelector('.fit-batch');
+                            const fitDataCell = fitBatchRow.querySelector('.fit-data');
+                            const batchDataCell = fitBatchRow.querySelector('.batch-data');
                             const fitVal = data['FIT'];
+                            const batchVal = data['BATCH'];
+                            
+                            const hasFit = fitVal !== undefined && fitVal !== null && String(fitVal).trim() !== '';
+                            const hasBatch = batchVal !== undefined && batchVal !== null && String(batchVal).trim() !== '';
 
-                            if (fitVal) {
-                                fitSpan.textContent = fitVal;
+                            if (hasFit || hasBatch) {
+                                fitDataCell.textContent = hasFit ? String(fitVal).trim() : '';
+                                batchDataCell.textContent = hasBatch ? String(batchVal).trim() : '';
+
+                                if (hasFit && hasBatch) {
+                                    fitDataCell.colSpan = 2;
+                                    batchDataCell.colSpan = 2;
+                                } else if (hasFit) {
+                                    fitDataCell.colSpan = 4;
+                                    batchDataCell.style.display = 'none';
+                                } else if (hasBatch) {
+                                    batchDataCell.colSpan = 4;
+                                    fitDataCell.style.display = 'none';
+                                }
+                                fitBatchRow.style.display = '';
                             } else {
-                                fitSpan.remove();
+                                fitBatchRow.style.display = 'none';
                             }
-                            if (batchVal) {
-                                batchSpan.textContent = batchVal;
-                            } else {
-                                batchSpan.remove();
-                            }
-                            if (!batchVal && !fitVal) {
-                                batchFitLine.remove();
-                            }
+
 
                             const barcode = label.querySelector('.barcode');
                             const rawBarcode = String(data['EAN'] || '0000000000000').trim();
                             setTimeout(() => {
-                                JsBarcode(barcode, rawBarcode, {
-                                    format: "CODE128",
-                                    width: 1,
-                                    height: 9,
-                                    fontSize: 10,
-                                    textMargin: 0,
-                                    margin: 0,
-                                    fontOptions: "bold",
-                                    displayValue: true
-                                });
+                                if (barcode) {
+                                    JsBarcode(barcode, rawBarcode, {
+                                        format: "CODE128",
+                                        width: 1,
+                                        height: 9,
+                                        fontSize: 10,
+                                        textMargin: 0,
+                                        margin: 0,
+                                        fontOptions: "bold",
+                                        displayValue: true
+                                    });
+                                }
                             }, 0);
 
-                            const mrp = label.querySelector('.mrp');
-                            mrp.innerHTML = `MRP ₹ <span class="data-bold">${data['MRP'] || '0.00'}</span><small>(Inclusive of all taxes)</small>`;
+                            const mrpEl = label.querySelector('.mrp');
+                            if (mrpEl) {
+                                mrpEl.innerHTML = `MRP ₹ <span class="data-bold">${data['MRP'] || '0.00'}</span><small>(Inclusive of all taxes)</small>`;
+                            }
                             
                             const vcodeCircle = label.querySelector('.vcode-circle');
                             if (vcodeCircle) {
@@ -873,16 +1210,6 @@
                         }
                     });
                 }
-
-                document.getElementById(`portraitLabelBtn${prefix}`).addEventListener('click', () => {
-                    generateLabels(currentLabelsData, portraitContainer, templateData, 'portrait-label');
-                    showPage(pageElements[`${prefix.toLowerCase()}PortraitPreview`]);
-                });
-
-                document.getElementById(`landscapeLabelBtn${prefix}`).addEventListener('click', () => {
-                    generateLabels(currentLabelsData, landscapeContainer, templateData, 'landscape-label');
-                    showPage(pageElements[`${prefix.toLowerCase()}LandscapePreview`]);
-                });
                 
                 document.getElementById(`printPortraitPdfBtn${prefix}`).addEventListener('click', () => {
                     const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-portrait-preview-page`);
