@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MRP Label Generator</title>
+    <link rel="shortcut icon" href="./logo1.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <meta property="og:image" content="https://muhsin-codes.github.io/MRP-LABEL-GENERATOR/logo1.png">
+    <style>
+        body {
+            margin: 0;
+            background: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .page {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .page.active {
+            display: block;
+        }
+        .generator-header {
+            text-align: center;
+            color: #fff;
+            background-color: #06005c;
+        }
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            background-color: transparent;
+            z-index: 1000;
+        }
+        .button-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            gap: 10px;
+        }
+        .btn-custom {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid white;
+            border-radius: 25px;
+            color: #ffffff;
+        }
+        .btn-primary-custom {
+            background-color: rgb(0, 24, 118);
+        }
+        .btn-primary-custom:hover {
+            background-color: rgb(0, 14, 72);
+        }
+        .btn-accent-custom {
+            background-color: rgb(107, 107, 255);
+        }
+        .btn-accent-custom:hover {
+            background-color: rgb(77, 77, 255);
+        }
+        .btn-warning-custom {
+            background-color: rgb(235, 255, 53);
+            color: black;
+        }
+        .btn-warning-custom:hover {
+            background-color: rgb(229, 255, 0);
+        }
+        .btn-dark-custom {
+            background-color: rgb(77, 77, 77);
+        }
+        .btn-dark-custom:hover {
+            background-color: rgb(0, 0, 0);
+        }
+        .btn-success-custom {
+            background-color: rgb(24, 155, 0);
+        }
+        .btn-success-custom:hover {
+            background-color: rgb(16, 107, 0);
+        }
+        .btn-danger-custom {
+            background-color: rgb(155, 0, 0);
+        }
+        .btn-danger-custom:hover {
+            background-color: rgb(107, 0, 0);
+        }
+        .file-hint {
+            display: block;
+            text-align: center;
+            font-size: x-small;
+            color: rgba(128, 128, 128, 0.836);
+        }
+        .inline-error-box {
+            display: none;
+            border: 1px solid #f5c2c7;
+            background-color: #fff3cd;
+            color: #842029;
+            border-radius: 5px;
+            margin: 20px auto;
+            width: 80%;
+            font-size: 14px;
+            padding: 10px 15px;
+            position: relative;
+            text-align: left;
+        }
+        .inline-error-box .close-btn, .inline-error-box .ok-btn {
+            cursor: pointer;
+            border: none;
+        }
+        .inline-error-box .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-weight: bold;
+            color: #842029;
+            background: none;
+            font-size: 18px;
+        }
+        .inline-error-box .ok-btn {
+            display: block;
+            margin: 15px auto 5px auto;
+            padding: 5px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            background-color: #842029;
+            color: white;
+            border-radius: 5px;
+        }
+        .card-container {
+            background-color: white;
+            padding:0.05in;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            display: inline-block;
+            vertical-align: top;
+            margin: 2px;
+        }
+        .portrait-label .label-container {
+            width: 1.58in;
+            height: 2.36in;
+            padding: 0.025in;
+            background: #ffffff;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            font-size: 6px;
+            line-height: 1.1;
+            overflow: hidden;
+            border: 1px solid rgb(255, 255, 255);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+        }
+        .portrait-label.no-border .label-container {
+             border: none;
+        }
+        .landscape-label .label-container {
+            width: 2.36in;
+            height: 1.58in;
+            padding: 0.07in;
+            background: #ffffff;
+            border-radius: 0.15in;
+            box-sizing: border-box;
+            font-size: 6px;
+            line-height: 1.1;
+            overflow: hidden;
+            border: 1px solid rgb(255, 255, 255);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+        }
+         .landscape-label.no-border .label-container {
+             border: none;
+        }
+        .label-content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .landscape-label .label-content-wrapper {
+            transform: rotate(-90deg);
+            width: 1.58in;
+            height: 2.36in;
+            box-sizing: border-box;
+            padding: 0.025in;
+        }
+        .label-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            text-align: left;
+            padding: 0.05in;
+            line-height: 1.1;
+            font-size: 6px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .label-bold {
+            font-weight: normal;
+        }
+        .data-bold {
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .color-bold {
+            font-size: 8px;
+            font-weight: bold;
+        }
+        .mrp .data-bold {
+            font-size: 15px;
+        }
+        .section{
+            font-size: 7px;
+            margin-bottom: 1px;
+            font-weight: normal;
+        }
+        .section.style {
+            font-size: 7px;
+        }
+        .section.desc {
+            font-size: 6.5px;
+        }
+        .section.size {
+            font-size: 7px;
+        }
+        .section1 {
+            font-size: 7px;
+            margin-bottom: 1px;
+        }
+        .section2 {
+            font-size: 7px;
+            margin-bottom: 1px;
+            font-weight: normal;
+        }
+        .cb{
+            font-size: 10px;
+            font-weight: bold;
+            padding-left: 0;
+            padding-right: 0;
+            width: 5px;
+        }
+        .batch-fit-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        .barcode-container {
+            text-align: center;
+            margin: 1px 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .barcode {
+            width: 90%;
+            height: 23px;
+            max-width: 100%;
+        }
+        .mrp {
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 3px;
+        }
+        .mrp small {
+            display: block;
+            font-weight: normal;
+            font-size: 7px;
+        }
+        .center-text {
+            text-align: center;
+        }
+        .vcode-circle {
+            background: rgba(255, 255, 255, 0);
+            color: black;
+            font-weight: bolder;
+            font-size: 7px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            z-index: 10;
+            border: none;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .label-content table tr td {
+            border: 1px solid black;
+            text-align: left;
+            background-color: white;
+        }
+        .label-content table.no-border tr td {
+            border: none;
+        }
+        .label-content table tr td:first-child {
+            font-weight: normal;
+        }
+        .label-content table tr td:nth-child(3) {
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .vcode-column {
+            width: 22px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .btn-custom {
+                font-size: 10px;
+            }
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .page:not(.print-active) {
+                display: none !important;
+            }
+            .button-row,
+            .file-hint,
+            .inline-error-box,
+            .generator-header,
+            .sticky-top {
+                display: none !important;
+            }
+            .label-container {
+                padding: 0;
+                justify-content: flex-start;
+                align-items: flex-start;
+                align-content: flex-start;
+            }
+            .pdf-print-mode .card-container {
+                margin: 0;
+                page-break-inside: avoid;
+                padding: 0.05in;
+                border-radius: 0.15in;
+                box-sizing: border-box;
+                display: inline-block;
+                vertical-align: top;
+            }
+            .pdf-print-mode.portrait-print-mode {
+                @page {
+                    size: 1.68in 2.46in;
+                    margin: 0;
+                }
+            }
+            .pdf-print-mode.landscape-print-mode {
+                @page {
+                    size: 2.46in 1.68in;
+                    margin: 0;
+                }
+            }
+            .tsc-print-mode .card-container {
+                margin: 0;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+                background-color: transparent;
+                page-break-inside: avoid;
+            }
+            .tsc-print-mode.portrait-print-mode {
+                @page {
+                    size: 1.68in 2.46in;
+                    margin: 0;
+                }
+            }
+            .tsc-print-mode.landscape-print-mode {
+                @page {
+                    size: 2.46in 1.68in;
+                    margin: 0;
+                }
+            }
+            body > *:not(.print-active) {
+                display: none;
+            }
+        }
+        .barcode-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 9px;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .barcode-section .barcode-text {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .barcode-section .fit-data,
+        .barcode-section .batch-data {
+            font-weight: bold;
+            font-size: 9px;
+        }
+        .barcode-section .fit-data {
+            text-align: left;
+        }
+        .barcode-section .batch-data {
+            text-align: right;
+        }
+        .sticky-footer-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background-color: #06005c;
+            z-index: 999;
+        }
+        .input-table-container {
+            padding: 20px;
+            max-height: 80vh;
+            position: relative;
+            background-color: #ffffff;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .input-table-container table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .input-table-container th,
+        .input-table-container td {
+            border: 1px solid #ddd;
+            padding: 2px;
+            text-align: center;
+            font-size: 12px;
+            background-color: #fff;
+        }
+        .input-table-container th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .input-table-container input {
+            width: 100%;
+            border: none;
+            padding: 0;
+            text-align: center;
+            background-color: transparent;
+            font-size: 12px;
+        }
+        .input-table-container input:focus {
+            outline: none;
+        }
+        .input-table-container tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .input-table-container td.selected {
+            border: 2px solid #008000;
+            z-index: 1;
+            position: relative;
+        }
+        .input-table-container td.selected-range {
+            background-color: #e0e0e0;
+            border: 2px solid #008000;
+        }
+        .input-table-container td.editing {
+            border: 2px solid #008000;
+            cursor: text;
+        }
+        .input-table-container td.selected:not(.editing) input {
+            caret-color: transparent;
+        }
+        .input-table-body-wrapper {
+            max-height: calc(80vh - 30px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+            flex-grow: 1;
+        }
+        .input-table-container table thead {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        .input-table-container table tbody {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        .input-table-container table thead tr,
+        .input-table-container table tbody tr {
+            width: 100%;
+            display: table-row;
+        }
+        .input-table-container table th,
+        .input-table-container table td {
+            width: calc(100% / 12);
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-page" class="page active">
+        <div class="sticky-top">
+            <h1 class="generator-header">MRP LABEL GENERATOR</h1>
+            <div class="button-row">
+                <button id="cfBtn" class="btn-custom btn-primary-custom">CF MRP</button>
+                <button id="btBtn" class="btn-custom btn-primary-custom">BT MRP</button>
+            </div>
+        </div>
+    </div>
+    <div id="cfmrp-import-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Import Data</h1>
+            <div class="button-row">
+                <button id="inputBtnCF" class="btn-custom btn-success-custom">Input</button>
+                <label for="excelFileCF" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+                <input type="file" id="excelFileCF" accept=".xlsx, .xls, .csv" style="display: none;" />
+                <button id="goToMainPageCF" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <small class="file-hint file-hint-cf">File Format: CSV or XLS or XLSX</small>
+        <div id="inlineErrorBoxCF" class="inline-error-box">
+            <button class="close-btn">×</button>
+            <div id="inlineErrorMessageCF"></div>
+            <button class="ok-btn">OK</button>
+        </div>
+    </div>
+    <div id="btmrp-import-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Import Data</h1>
+            <div class="button-row">
+                <button id="inputBtnBT" class="btn-custom btn-success-custom">Input</button>
+                <label for="excelFileBT" class="btn-custom btn-accent-custom">Import Excel/CSV</label>
+                <input type="file" id="excelFileBT" accept=".xlsx, .xls, .csv" style="display: none;" />
+                <button id="goToMainPageBT" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <small class="file-hint file-hint-bt">File Format: CSV or XLS or XLSX</small>
+        <div id="inlineErrorBoxBT" class="inline-error-box">
+            <button class="close-btn">×</button>
+            <div id="inlineErrorMessageBT"></div>
+            <button class="ok-btn">OK</button>
+        </div>
+    </div>
+    <div id="cfmrp-input-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Manual Input</h1>
+            <div class="button-row">
+                <button id="processInputDataCF" class="btn-custom btn-success-custom">Process Data</button>
+                <button id="clearSheetBtnCF" class="btn-custom btn-danger-custom">Clear Sheet</button>
+                <button id="backToImportPageFromInputCF" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromInput" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="inputTableContainerCF" class="input-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 75px;">STYLE CODE</th>
+                        <th style="width: 60px;">SIZE</th>
+                        <th style="width: 60px;">MRP</th>
+                        <th style="width: 250px;">COLOR</th>
+                        <th style="width: 200px;">DESCRIPTION</th>
+                        <th style="width: 70px;">PKD</th>
+                        <th style="width: 100px;">EAN</th>
+                        <th style="width: 50px;">BATCH</th>
+                        <th style="width: 75px;">FIT</th>
+                        <th style="width: 40px;">QTY</th>
+                        <th style="width: 40px;">NOS</th>
+                        <th style="width: 40px;">VCODE</th>
+                        <th style="width: 11px;"> </th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="input-table-body-wrapper">
+                <table id="inputDataTableCF">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="btmrp-input-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Manual Input</h1>
+            <div class="button-row">
+                <button id="processInputDataBT" class="btn-custom btn-success-custom">Process Data</button>
+                <button id="clearSheetBtnBT" class="btn-custom btn-danger-custom">Clear Sheet</button>
+                <button id="backToImportPageFromInputBT" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromInput" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="inputTableContainerBT" class="input-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 75px;">STYLE CODE</th>
+                        <th style="width: 60px;">SIZE</th>
+                        <th style="width: 60px;">MRP</th>
+                        <th style="width: 250px;">COLOR</th>
+                        <th style="width: 200px;">DESCRIPTION</th>
+                        <th style="width: 70px;">PKD</th>
+                        <th style="width: 100px;">EAN</th>
+                        <th style="width: 50px;">BATCH</th>
+                        <th style="width: 75px;">FIT</th>
+                        <th style="width: 40px;">QTY</th>
+                        <th style="width: 40px;">NOS</th>
+                        <th style="width: 40px;">VCODE</th>
+                        <th style="width: 11px;"> </th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="input-table-body-wrapper">
+                <table id="inputDataTableBT">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="cfmrp-label-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Select Label Type</h1>
+            <div class="button-row">
+                <button id="portraitLabelBtnCF" class="btn-custom btn-success-custom">Portrait Labels</button>
+                <button id="landscapeLabelBtnCF" class="btn-custom btn-success-custom">Landscape Labels</button>
+                <button id="backToImportPageCF" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    <div id="cfmrp-print-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Select Print Type</h1>
+            <div class="button-row">
+                <button id="printWithBorderBtnCF" class="btn-custom btn-success-custom">With Border</button>
+                <button id="printWithoutBorderBtnCF" class="btn-custom btn-success-custom">Without Border</button>
+                <button id="backToLabelTypePageCF" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromPrintType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    <div id="cfmrp-portrait-preview-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Portrait Preview</h1>
+            <div class="button-row">
+                <button id="printPortraitPdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printPortraitTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnCF_Portrait" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="portrait-containerCF" class="label-container"></div>
+    </div>
+    <div id="cfmrp-landscape-preview-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">CF MRP - Landscape Preview</h1>
+            <div class="button-row">
+                <button id="printLandscapePdfBtnCF" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printLandscapeTscBtnCF" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnCF_Landscape" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageCF_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="landscape-containerCF" class="label-container"></div>
+    </div>
+    <div id="btmrp-label-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Select Label Type</h1>
+            <div class="button-row">
+                <button id="portraitLabelBtnBT" class="btn-custom btn-success-custom">Portrait Labels</button>
+                <button id="landscapeLabelBtnBT" class="btn-custom btn-success-custom">Landscape Labels</button>
+                <button id="backToImportPageBT" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    <div id="btmrp-print-type-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Select Print Type</h1>
+            <div class="button-row">
+                <button id="printWithBorderBtnBT" class="btn-custom btn-success-custom">With Border</button>
+                <button id="printWithoutBorderBtnBT" class="btn-custom btn-success-custom">Without Border</button>
+                <button id="backToLabelTypePageBT" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromPrintType" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+    </div>
+    <div id="btmrp-portrait-preview-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Portrait Preview</h1>
+            <div class="button-row">
+                <button id="printPortraitPdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printPortraitTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnBT_Portrait" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromPortrait" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="portrait-containerBT" class="label-container"></div>
+    </div>
+    <div id="btmrp-landscape-preview-page" class="page">
+        <div class="sticky-top">
+            <h1 class="generator-header">BT MRP - Landscape Preview</h1>
+            <div class="button-row">
+                <button id="printLandscapePdfBtnBT" class="btn-custom btn-success-custom">Print With Gap</button>
+                <button id="printLandscapeTscBtnBT" class="btn-custom btn-success-custom">Print Without Gap</button>
+                <button id="backToTypeBtnBT_Landscape" class="btn-custom btn-dark-custom">Back</button>
+                <button id="goToMainPageBT_fromLandscape" class="btn-custom btn-warning-custom">Main Page</button>
+            </div>
+        </div>
+        <div id="landscape-containerBT" class="label-container"></div>
+    </div>
+    <template id="label-template">
+        <div class="card-container">
+            <div class="label-container">
+                <div class="label-content-wrapper">
+                    <div class="label-content">
+                        <table style="width:100%; border-collapse: collapse;" >
+                            <tr class="section style">
+                                <td class="label-bold" style="width: 30%;">STYLE CODE</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section color">
+                                <td class="label-bold" style="width: 30%;">COLOR</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section desc">
+                                <td class="label-bold" style="width: 30%;">DESCRIPTION</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section size">
+                                <td class="label-bold" style="width: 30%;">SIZE</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section qty">
+                                <td class="label-bold" style="width: 30%;">NET QTY</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section pkd">
+                                <td class="label-bold" style="width: 30%;">PKD DATE</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section fit-batch">
+                                <td class="data-bold fit-data" colspan="2" style="font-size: 7px; font-weight:bold; text-align:left;"></td>
+                                <td class="data-bold batch-data" colspan="2" style="font-size: 7px; font-weight:bold; text-align:right;"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="barcode-container">
+                                        <svg class="barcode"></svg>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="section1">
+                                        <span style="font-weight: bold;">Marketed By:</span><br>
+                                    </div>
+                                    <div class="section1" style="margin-top: 1px;">
+                                        <span class="address-content"></span>
+                                    </div>
+                                    <div class="section1" style="margin-top: 1px;">
+                                        For customer complaints<br>
+                                        <span class="contact-content"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="mrp-cell" style=" text-align: center;">
+                                    <div class="mrp">MRP ₹ 0.00 <small>(Inclusive of all taxes)</small></div>
+                                </td>
+                                <td class="vcode-column">
+                                    <div class="vcode-circle">VCODE</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="label-template-no-border">
+        <div class="card-container">
+            <div class="label-container no-border">
+                <div class="label-content-wrapper">
+                    <div class="label-content">
+                        <table style="width:100%; border-collapse: collapse;" class="no-border">
+                            <tr class="section style">
+                                <td class="label-bold" style="width: 30%;">STYLE CODE</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section color">
+                                <td class="label-bold" style="width: 30%;">COLOR</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section desc">
+                                <td class="label-bold" style="width: 30%;">DESCRIPTION</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section size">
+                                <td class="label-bold" style="width: 30%;">SIZE</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section qty">
+                                <td class="label-bold" style="width: 30%;">NET QTY</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section pkd">
+                                <td class="label-bold" style="width: 30%;">PKD DATE</td>
+                                <td class="cb">:</td>
+                                <td class="data-bold" colspan="2"></td>
+                            </tr>
+                            <tr class="section fit-batch">
+                                <td class="data-bold fit-data" colspan="2" style="font-size: 7px; font-weight:bold; text-align:left;"></td>
+                                <td class="data-bold batch-data" colspan="2" style="font-size: 7px; font-weight:bold; text-align:right;"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <div class="barcode-container">
+                                        <svg class="barcode"></svg>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="section1">
+                                        <span style="font-weight: bold;">Marketed By:</span><br>
+                                    </div>
+                                    <div class="section1" style="margin-top: 1px;">
+                                        <span class="address-content"></span>
+                                    </div>
+                                    <div class="section1" style="margin-top: 1px;">
+                                        For customer complaints<br>
+                                        <span class="contact-content"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="mrp-cell" style=" text-align: center;">
+                                    <div class="mrp">MRP ₹ 0.00 <small>(Inclusive of all taxes)</small></div>
+                                </td>
+                                <td class="vcode-column">
+                                    <div class="vcode-circle">VCODE</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <div class="sticky-footer-container">
+        <p class="text-center text-light">Developed By <span style="font-size: small;">Muhsin</span></p>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const LABEL_TEMPLATES = {
+            CF: {
+                title: "CF MRP LABEL GENERATOR",
+                address: [
+                    "COMFORT FACTORY",
+                    "CHERUVANNUR",
+                    "FEROKE, KOLATHARA PO",
+                    "KOZHIKODE - 673655"
+                ],
+                contact: "Contact Us : 8525853666",
+                headers: [
+                    "STYLE CODE", "COLOR", "DESCRIPTION", "SIZE", "NOS",
+                    "PKD", "EAN", "BATCH", "FIT", "MRP", "QTY", "VCODE"
+                ]
+            },
+            BT: {
+                title: "BT MRP LABEL GENERATOR",
+                address: [
+                    "Blue tyga Fashions Pvt.Ltd",
+                    "SIDCO Industrial Estate",
+                    "Malumichampatti",
+                    "Coimbatore - 641050"
+                ],
+                contact: "Mail Us : contact@bluetyga.com",
+                headers: [
+                    "STYLE CODE", "COLOR", "DESCRIPTION", "SIZE", "NOS",
+                    "PKD", "EAN", "BATCH", "FIT", "MRP", "QTY", "VCODE"
+                ]
+            }
+        };
+        const pageElements = {
+            main: document.getElementById('main-page'),
+            cfImport: document.getElementById('cfmrp-import-page'),
+            btImport: document.getElementById('btmrp-import-page'),
+            cfInput: document.getElementById('cfmrp-input-page'),
+            btInput: document.getElementById('btmrp-input-page'),
+            cfLabelType: document.getElementById('cfmrp-label-type-page'),
+            btLabelType: document.getElementById('btmrp-label-type-page'),
+            cfPrintType: document.getElementById('cfmrp-print-type-page'),
+            btPrintType: document.getElementById('btmrp-print-type-page'),
+            cfPortraitPreview: document.getElementById('cfmrp-portrait-preview-page'),
+            btPortraitPreview: document.getElementById('btmrp-portrait-preview-page'),
+            cfLandscapePreview: document.getElementById('cfmrp-landscape-preview-page'),
+            btLandscapePreview: document.getElementById('btmrp-landscape-preview-page'),
+        };
+        let currentLabelsData = [];
+        let currentPrefix = '';
+        let currentLabelOrientation = '';
+        const DEFAULT_ROWS = 20;
+        function showPage(pageElement) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            if (pageElement) {
+                pageElement.classList.add('active');
+            } else {
+                console.error("Page element not found.");
+            }
+        }
+        function clearPageData(prefix) {
+            const fileInput = document.getElementById('excelFile' + prefix);
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            const portraitContainer = document.getElementById('portrait-container' + prefix);
+            if (portraitContainer) {
+                portraitContainer.innerHTML = '';
+            }
+            const landscapeContainer = document.getElementById('landscape-container' + prefix);
+            if (landscapeContainer) {
+                landscapeContainer.innerHTML = '';
+            }
+            hideInlineError(prefix);
+            currentLabelsData = [];
+        }
+        function showInlineError(prefix, message) {
+            const currentErrorBox = document.getElementById('inlineErrorBox' + prefix);
+            const currentErrorMessage = document.getElementById('inlineErrorMessage' + prefix);
+            if (currentErrorBox && currentErrorMessage) {
+                currentErrorMessage.innerHTML = message;
+                currentErrorBox.style.display = 'block';
+                currentErrorBox.querySelector('.close-btn').addEventListener('click', () => hideInlineError(prefix), { once: true });
+                currentErrorBox.querySelector('.ok-btn').addEventListener('click', () => hideInlineError(prefix), { once: true });
+            }
+        }
+        function hideInlineError(prefix) {
+            const currentErrorBox = document.getElementById('inlineErrorBox' + prefix);
+            if (currentErrorBox) {
+                currentErrorBox.style.display = 'none';
+            }
+        }
+        document.getElementById('cfBtn').addEventListener('click', () => {
+            currentPrefix = 'CF';
+            showPage(pageElements.cfImport);
+        });
+        document.getElementById('btBtn').addEventListener('click', () => {
+            currentPrefix = 'BT';
+            showPage(pageElements.btImport);
+        });
+        document.getElementById('goToMainPageCF').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageCF_fromType').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageCF_fromPrintType').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageCF_fromPortrait').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageCF_fromLandscape').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageCF_fromInput').addEventListener('click', () => {
+            clearPageData('CF');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageBT').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageBT_fromType').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageBT_fromPrintType').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageBT_fromPortrait').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+        document.getElementById('goToMainPageBT_fromLandscape').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+         document.getElementById('goToMainPageBT_fromInput').addEventListener('click', () => {
+            clearPageData('BT');
+            showPage(pageElements.main);
+        });
+        function setupExcelLikeTable(tableId) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const tableBodyWrapper = table.closest('.input-table-body-wrapper');
+            let selectedCell = null;
+            let startCellForRange = null;
+            let isSelectingRange = false;
+            let isMouseDown = false;
+            let originalCellValue = '';
+            let undoStack = [];
+            let redoStack = [];
+            const MAX_UNDO_STACK_SIZE = 100;
+            function saveState() {
+                const currentState = [];
+                tbody.querySelectorAll('tr').forEach(row => {
+                    const rowData = [];
+                    row.querySelectorAll('input').forEach(input => {
+                        rowData.push(input.value);
+                    });
+                    currentState.push(rowData);
+                });
+                undoStack.push(currentState);
+                if (undoStack.length > MAX_UNDO_STACK_SIZE) {
+                    undoStack.shift();
+                }
+                redoStack = [];
+            }
+            function applyState(state) {
+                if (!state) return;
+                while (tbody.rows.length < state.length) {
+                    addRow(tableId);
+                }
+                while (tbody.rows.length > state.length) {
+                    tbody.deleteRow(-1);
+                }
+                tbody.querySelectorAll('tr').forEach((row, rowIndex) => {
+                    row.querySelectorAll('input').forEach((input, colIndex) => {
+                        if (state[rowIndex] && state[rowIndex][colIndex] !== undefined) {
+                            input.value = state[rowIndex][colIndex];
+                        }
+                    });
+                });
+            }
+            function undo() {
+                if (undoStack.length > 1) {
+                    const currentState = undoStack.pop();
+                    redoStack.push(currentState);
+                    applyState(undoStack[undoStack.length - 1]);
+                }
+            }
+            function redo() {
+                if (redoStack.length > 0) {
+                    const nextState = redoStack.pop();
+                    undoStack.push(nextState);
+                    applyState(nextState);
+                }
+            }
+            saveState();
+            const getCoords = (cell) => {
+                const row = cell.closest('tr');
+                const rowIndex = Array.from(tbody.rows).indexOf(row);
+                const colIndex = Array.from(row.cells).indexOf(cell);
+                return { row: rowIndex, col: colIndex };
+            };
+            const getCell = (rowIndex, colIndex) => {
+                const targetRow = tbody.rows[rowIndex];
+                if (targetRow) {
+                    return targetRow.cells[colIndex];
+                }
+                return null;
+            };
+            const clearSelections = () => {
+                tbody.querySelectorAll('td').forEach(cell => {
+                    cell.classList.remove('selected', 'selected-range', 'editing');
+                    const input = cell.querySelector('input');
+                    if (input) {
+                        input.blur();
+                    }
+                });
+                selectedCell = null;
+                startCellForRange = null;
+            };
+            const selectCell = (cell) => {
+                if (!cell || !tbody.contains(cell)) return;
+                clearSelections();
+                selectedCell = cell;
+                selectedCell.classList.add('selected');
+                startCellForRange = cell;
+                const input = selectedCell.querySelector('input');
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+                scrollIntoView(selectedCell);
+            };
+            const enterEditMode = (cell, initialChar = null) => {
+                if (!cell || !tbody.contains(cell)) return;
+                tbody.querySelectorAll('td.selected-range').forEach(c => c.classList.remove('selected-range'));
+                selectedCell = cell;
+                selectedCell.classList.add('selected', 'editing');
+                startCellForRange = cell;
+                const input = cell.querySelector('input');
+                if (input) {
+                    originalCellValue = input.value;
+                    input.focus();
+                    if (initialChar !== null) {
+                        input.value = initialChar;
+                        input.setSelectionRange(1, 1);
+                    } else {
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }
+                scrollIntoView(selectedCell);
+            };
+            const exitEditMode = (cell, revert = false) => {
+                if (!cell || !tbody.contains(cell)) return;
+                cell.classList.remove('editing');
+                const input = cell.querySelector('input');
+                if (input) {
+                    input.blur();
+                    if (revert) {
+                        input.value = originalCellValue;
+                    }
+                }
+                saveState();
+            };
+            const deleteSelectedCells = () => {
+                saveState();
+                const selectedRangeCells = tbody.querySelectorAll('td.selected-range');
+                if (selectedRangeCells.length > 0) {
+                    selectedRangeCells.forEach(cell => {
+                        const input = cell.querySelector('input');
+                        if (input) input.value = '';
+                    });
+                    const topRow = Math.min(...Array.from(selectedRangeCells).map(c => getCoords(c).row));
+                    const leftCol = Math.min(...Array.from(selectedRangeCells).map(c => getCoords(c).col));
+                    const firstCell = getCell(topRow, leftCol);
+                    if (firstCell) {
+                        selectCell(firstCell);
+                    }
+                } else if (selectedCell && tbody.contains(selectedCell)) {
+                    const input = selectedCell.querySelector('input');
+                    if (input) input.value = '';
+                }
+            };
+            const scrollIntoView = (cell) => {
+                if (!cell || !tableBodyWrapper) return;
+                const cellRect = cell.getBoundingClientRect();
+                const wrapperRect = tableBodyWrapper.getBoundingClientRect();
+                if (cellRect.top < wrapperRect.top) {
+                    tableBodyWrapper.scrollTop += (cellRect.top - wrapperRect.top);
+                } else if (cellRect.bottom > wrapperRect.bottom) {
+                    tableBodyWrapper.scrollTop += (cellRect.bottom - wrapperRect.bottom);
+                }
+                if (cellRect.left < wrapperRect.left) {
+                    tableBodyWrapper.scrollLeft += (cellRect.left - wrapperRect.left);
+                } else if (cellRect.right > wrapperRect.right) {
+                    tableBodyWrapper.scrollLeft += (cellRect.right - wrapperRect.right);
+                }
+            };
+            table.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                isMouseDown = true;
+                const cell = e.target.closest('td');
+                if (!cell || !tbody.contains(cell)) return;
+                if (!e.shiftKey) {
+                    selectCell(cell);
+                } else {
+                    if (!startCellForRange && selectedCell && tbody.contains(selectedCell)) {
+                        startCellForRange = selectedCell;
+                    } else if (!startCellForRange) {
+                        startCellForRange = cell;
+                    }
+                    if (!startCellForRange || !tbody.contains(startCellForRange)) {
+                        startCellForRange = cell;
+                    }
+                    const startCoords = getCoords(startCellForRange);
+                    const endCoords = getCoords(cell);
+                    const minRow = Math.min(startCoords.row, endCoords.row);
+                    const maxRow = Math.max(startCoords.row, endCoords.row);
+                    const minCol = Math.min(startCoords.col, endCoords.col);
+                    const maxCol = Math.max(startCoords.col, endCoords.col);
+                    tbody.querySelectorAll('td').forEach(c => c.classList.remove('selected-range', 'selected', 'editing'));   
+                    for (let r = minRow; r <= maxRow; r++) {
+                        for (let c = minCol; c <= maxCol; c++) {
+                            const rangeCell = getCell(r, c);
+                            if (rangeCell) {
+                                rangeCell.classList.add('selected-range');
+                            }
+                        }
+                    }
+                    selectedCell = cell;
+                    selectedCell.classList.add('selected');
+                    const input = selectedCell.querySelector('input');
+                    if (input) input.focus();
+                    scrollIntoView(selectedCell);
+                }
+                isSelectingRange = true;
+                const handleMouseMove = (moveEvent) => {
+                    if (!isMouseDown || !isSelectingRange) return;
+                    const endCell = moveEvent.target.closest('td');
+                    if (!endCell || !tbody.contains(endCell)) return;
+                    const startCoords = getCoords(startCellForRange);
+                    const endCoords = getCoords(endCell);
+                    const minRow = Math.min(startCoords.row, endCoords.row);
+                    const maxRow = Math.max(startCoords.row, endCoords.row);
+                    const minCol = Math.min(startCoords.col, endCoords.col);
+                    const maxCol = Math.max(startCoords.col, endCoords.col);
+                    tbody.querySelectorAll('td').forEach(c => c.classList.remove('selected-range', 'selected', 'editing'));  
+                    for (let r = minRow; r <= maxRow; r++) {
+                        for (let c = minCol; c <= maxCol; c++) {
+                            const rangeCell = getCell(r, c);
+                            if (rangeCell) {
+                                rangeCell.classList.add('selected-range');
+                            }
+                        }
+                    }
+                    selectedCell = endCell;
+                    selectedCell.classList.add('selected');
+                    const input = selectedCell.querySelector('input');
+                    if (input) input.focus();
+                    scrollIntoView(selectedCell);
+                };
+                const handleMouseUp = () => {
+                    isMouseDown = false;
+                    isSelectingRange = false;
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            });
+            table.addEventListener('dblclick', (e) => {
+                const cell = e.target.closest('td');
+                if (!cell || !tbody.contains(cell)) return;
+                enterEditMode(cell);
+            });
+            table.addEventListener('keydown', (e) => {
+                if (!selectedCell || !tbody.contains(selectedCell)) return;
+                const isEditing = selectedCell.classList.contains('editing');
+                const inputElement = selectedCell.querySelector('input');
+                if (isEditing) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        exitEditMode(selectedCell);
+                        const { row, col } = getCoords(selectedCell);
+                        const nextCell = getCell(row + 1, col);
+                        if (nextCell) {
+                            selectCell(nextCell);
+                        } else {
+                            selectCell(selectedCell);
+                        }
+                        return;
+                    }
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        exitEditMode(selectedCell, true);
+                        selectCell(selectedCell);
+                        return;
+                    }
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        exitEditMode(selectedCell);
+                        const { row, col } = getCoords(selectedCell);
+                        let nextRow = row + (e.key === 'ArrowDown' ? 1 : -1);
+                        nextRow = Math.max(0, Math.min(nextRow, tbody.rows.length - 1));   
+                        const nextCell = getCell(nextRow, col);
+                        if (nextCell) {
+                            selectCell(nextCell);
+                        }
+                        return;
+                    }
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                        const { selectionStart, selectionEnd, value } = inputElement;
+                        const textLength = value.length;
+                        const isAtStart = selectionStart === 0 && selectionEnd === 0;
+                        const isAtEnd = selectionStart === textLength && selectionEnd === textLength;
+                        if (
+                            (e.key === 'ArrowLeft' && isAtStart) || 
+                            (e.key === 'ArrowRight' && isAtEnd)
+                        ) {
+                            e.preventDefault();
+                            exitEditMode(selectedCell);
+                            const { row, col } = getCoords(selectedCell);
+                            let nextCell = null;
+                            switch (e.key) {
+                                case 'ArrowLeft':
+                                    nextCell = getCell(row, col - 1);
+                                    break;
+                                case 'ArrowRight':
+                                    nextCell = getCell(row, col + 1);
+                                    break;
+                            }
+                            if (nextCell) {
+                                selectCell(nextCell);
+                            }
+                        }
+                        return; 
+                    }
+                    return;
+                }
+                if (e.key.startsWith('Arrow')) {
+                    e.preventDefault();
+                    const { row, col } = getCoords(selectedCell);
+                    const numRows = tbody.rows.length;
+                    const numCols = tbody.rows[0].cells.length;
+                    let nextRow = row;
+                    let nextCol = col;
+                    if (e.ctrlKey) {
+                        switch (e.key) {
+                            case 'ArrowUp':
+                                let foundNonEmptyUp = false;
+                                for (let r = row - 1; r >= 0; r--) {
+                                    const cell = getCell(r, col);
+                                    if (cell && cell.querySelector('input').value.trim() !== '') {
+                                        nextRow = r;
+                                        foundNonEmptyUp = true;
+                                        break;
+                                    }
+                                }
+                                if (!foundNonEmptyUp) {
+                                    nextRow = 0;
+                                }
+                                break;
+                            case 'ArrowDown':
+                                let foundNonEmptyDown = false;
+                                for (let r = row + 1; r < numRows; r++) {
+                                    const cell = getCell(r, col);
+                                    if (cell && cell.querySelector('input').value.trim() !== '') {
+                                        nextRow = r;
+                                        foundNonEmptyDown = true;
+                                    }
+                                }
+                                if (!foundNonEmptyDown) {
+                                    nextRow = numRows - 1;
+                                }
+                                break;
+                            case 'ArrowLeft':
+                                let foundNonEmptyLeft = false;
+                                for (let c = col - 1; c >= 0; c--) {
+                                    const cell = getCell(row, c);
+                                    if (cell && cell.querySelector('input').value.trim() !== '') {
+                                        nextCol = c;
+                                        foundNonEmptyLeft = true;
+                                        break;
+                                    }
+                                }
+                                if (!foundNonEmptyLeft) {
+                                    nextCol = 0;
+                                }
+                                break;
+                            case 'ArrowRight':
+                                let foundNonEmptyRight = false;
+                                for (let c = col + 1; c < numCols; c++) {
+                                    const cell = getCell(row, c);
+                                    if (cell && cell.querySelector('input').value.trim() !== '') {
+                                        nextCol = c;
+                                        foundNonEmptyRight = true;
+                                    }
+                                }
+                                if (!foundNonEmptyRight) {
+                                    nextCol = numCols - 1;
+                                }
+                                break;
+                        }
+                    } 
+                    if (e.shiftKey) {
+                        if (!startCellForRange) {
+                            startCellForRange = selectedCell;
+                        }
+                        const startCoords = getCoords(startCellForRange);
+                        let endCoords;
+                        if (e.ctrlKey) {
+                            let targetRow = row;
+                            let targetCol = col;
+                            switch (e.key) {
+                                case 'ArrowUp':
+                                    let firstNonEmptyUp = -1;
+                                    for (let r = row - 1; r >= 0; r--) {
+                                        const cell = getCell(r, col);
+                                        if (cell && cell.querySelector('input').value.trim() !== '') {
+                                            firstNonEmptyUp = r;
+                                        } else if (firstNonEmptyUp !== -1) {
+                                            break;
+                                        }
+                                    }
+                                    targetRow = (firstNonEmptyUp !== -1) ? firstNonEmptyUp : 0;
+                                    break;
+                                case 'ArrowDown':
+                                    let lastNonEmptyDown = -1;
+                                    for (let r = row + 1; r < numRows; r++) {
+                                        const cell = getCell(r, col);
+                                        if (cell && cell.querySelector('input').value.trim() !== '') {
+                                            lastNonEmptyDown = r;
+                                        } else if (lastNonEmptyDown !== -1) {
+                                            break;
+                                        }
+                                    }
+                                    targetRow = (lastNonEmptyDown !== -1) ? lastNonEmptyDown : (numRows - 1);
+                                    break;
+                                case 'ArrowLeft':
+                                    let firstNonEmptyLeft = -1;
+                                    for (let c = col - 1; c >= 0; c--) {
+                                        const cell = getCell(row, c);
+                                        if (cell && cell.querySelector('input').value.trim() !== '') {
+                                            firstNonEmptyLeft = c;
+                                        } else if (firstNonEmptyLeft !== -1) {
+                                            break;
+                                        }
+                                    }
+                                    targetCol = (firstNonEmptyLeft !== -1) ? firstNonEmptyLeft : 0;
+                                    break;
+                                case 'ArrowRight':
+                                    let lastNonEmptyRight = -1;
+                                    for (let c = col + 1; c < numCols; c++) {
+                                        const cell = getCell(row, c);
+                                        if (cell && cell.querySelector('input').value.trim() !== '') {
+                                            lastNonEmptyRight = c;
+                                        } else if (lastNonEmptyRight !== -1) {
+                                            break;
+                                        }
+                                    }
+                                    targetCol = (lastNonEmptyRight !== -1) ? lastNonEmptyRight : (numCols - 1);
+                                    break;
+                            }
+                            endCoords = { row: targetRow, col: targetCol };
+                        } else {
+                            switch (e.key) {
+                                case 'ArrowUp':
+                                    nextRow--;
+                                    break;
+                                case 'ArrowDown':
+                                    nextRow++;
+                                    break;
+                                case 'ArrowLeft':
+                                    nextCol--;
+                                    break;
+                                case 'ArrowRight':
+                                    nextCol++;
+                                    break;
+                            }
+                            nextRow = Math.max(0, Math.min(nextRow, numRows - 1));
+                            nextCol = Math.max(0, Math.min(nextCol, numCols - 1));
+                            endCoords = { row: nextRow, col: nextCol };
+                        }
+                        const minR = Math.min(startCoords.row, endCoords.row);
+                        const maxR = Math.max(startCoords.row, endCoords.row);
+                        const minC = Math.min(startCoords.col, endCoords.col);
+                        const maxC = Math.max(startCoords.col, endCoords.col);
+                        tbody.querySelectorAll('td').forEach(c => c.classList.remove('selected-range', 'selected', 'editing'));
+                        for (let r = minR; r <= maxR; r++) {
+                            for (let c = minC; c <= maxC; c++) {
+                                const rangeCell = getCell(r, c);
+                                if (rangeCell) {
+                                    rangeCell.classList.add('selected-range');
+                                }
+                            }
+                        }
+                        selectedCell = getCell(endCoords.row, endCoords.col);
+                        selectedCell.classList.add('selected');
+                        const input = selectedCell.querySelector('input');
+                        if (input) input.focus();
+                        scrollIntoView(selectedCell);
+                    } else {
+                        switch (e.key) {
+                            case 'ArrowUp':
+                                nextRow--;
+                                break;
+                            case 'ArrowDown':
+                                nextRow++;
+                                break;
+                            case 'ArrowLeft':
+                                nextCol--;
+                                break;
+                            case 'ArrowRight':
+                                nextCol++;
+                                break;
+                        }
+                        nextRow = Math.max(0, Math.min(nextRow, numRows - 1));
+                        nextCol = Math.max(0, Math.min(nextCol, numCols - 1));
+                        const targetCell = getCell(nextRow, nextCol);
+                        selectCell(targetCell);
+                    }
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const { row, col } = getCoords(selectedCell);
+                    const numRows = tbody.rows.length;
+                    const numCols = tbody.rows[0].cells.length;
+                    let nextCol = col + 1;
+                    let nextRow = row;
+                    if (e.shiftKey) {
+                        nextCol = col - 1;
+                        if (nextCol < 0) {
+                            nextCol = numCols - 1;
+                            nextRow--;
+                            if (nextRow < 0) {
+                                nextRow = 0;
+                                nextCol = 0;
+                            }
+                        }
+                    } else {
+                        if (nextCol >= numCols) {
+                            nextCol = 0;
+                            nextRow++;
+                            if (nextRow >= numRows) {
+                                nextRow = numRows - 1;
+                                nextCol = numCols - 1;
+                            }
+                        }
+                    }
+                    const nextCell = getCell(nextRow, nextCol);
+                    selectCell(nextCell);
+                } else if (e.key === 'F2') {
+                    e.preventDefault();
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        enterEditMode(selectedCell);
+                    }
+                }
+                else if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        e.preventDefault();
+                        enterEditMode(selectedCell, e.key);
+                    }
+                } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        e.preventDefault();
+                        deleteSelectedCells();
+                    }
+                }
+                if (e.ctrlKey && (e.key ==='a'||e.key ==='A')) {
+                    e.preventDefault();
+                    clearSelections();
+                    tbody.querySelectorAll('td').forEach(cell => {
+                        cell.classList.add('selected-range');
+                    });
+                    const firstCell = getCell(0, 0);
+                    if (firstCell) {
+                        selectedCell = firstCell;
+                        selectedCell.classList.add('selected');
+                        const input = selectedCell.querySelector('input');
+                        if (input) {
+                            input.focus();
+                            input.select();
+                        }
+                        startCellForRange = firstCell;
+                    }
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'c'||e.key === 'C')) {
+                    e.preventDefault();
+                    const cellsToCopy = tbody.querySelectorAll('td.selected, td.selected-range');
+                    if (cellsToCopy.length > 0) {
+                        let clipboardText = '';
+                        const minRow = Math.min(...Array.from(cellsToCopy).map(c => getCoords(c).row));
+                        const maxRow = Math.max(...Array.from(cellsToCopy).map(c => getCoords(c).row));
+                        const minCol = Math.min(...Array.from(cellsToCopy).map(c => getCoords(c).col));
+                        const maxCol = Math.max(...Array.from(cellsToCopy).map(c => getCoords(c).col));
+                        for (let r = minRow; r <= maxRow; r++) {
+                            let rowData = [];
+                            for (let c = minCol; c <= maxCol; c++) {
+                                const cell = getCell(r, c);
+                                if (cell && (cell.classList.contains('selected') || cell.classList.contains('selected-range'))) {
+                                    rowData.push(cell.querySelector('input').value);
+                                } else {
+                                    rowData.push('');
+                                }
+                            }
+                            clipboardText += rowData.join('\t') + '\n';
+                        }
+                        navigator.clipboard.writeText(clipboardText.trim());
+                    }
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'v'||e.key === 'V')) {
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        saveState();
+                        navigator.clipboard.readText().then(pastedData => {
+                            const rows = pastedData.split('\n');
+                            const startCoords = getCoords(selectedCell);
+                            let tableRows = tbody.querySelectorAll('tr');
+                            const numCols = tbody.rows[0].cells.length;
+                            rows.forEach((row, rowIndex) => {
+                                const columns = row.split('\t');
+                                columns.forEach((column, colIndex) => {
+                                    const targetRowIndex = startCoords.row + rowIndex;
+                                    const targetColIndex = startCoords.col + colIndex;
+                                    while (!tableRows[targetRowIndex]) {
+                                        addRow(tableId);
+                                        tableRows = tbody.querySelectorAll('tr');
+                                    }
+                                    if (tableRows[targetRowIndex] && targetColIndex < numCols) {
+                                        const cells = tableRows[targetRowIndex].querySelectorAll('td');
+                                        if (cells[targetColIndex]) {
+                                            const input = cells[targetColIndex].querySelector('input');
+                                            if (input) {
+                                                input.value = column.trim();
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }).catch(err => {
+                            console.error('Failed to read clipboard contents: ', err);
+                        });
+                    }
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'd'||e.key === 'D')) {
+                    e.preventDefault();
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        saveState();
+                        const cellsInSelection = tbody.querySelectorAll('td.selected-range, td.selected');
+                        if (cellsInSelection.length > 0) {
+                            const columnValues = new Map();
+                            const selectedCellsByColumn = new Map();
+                            cellsInSelection.forEach(cell => {
+                                const { row, col } = getCoords(cell);
+                                if (!selectedCellsByColumn.has(col)) {
+                                    selectedCellsByColumn.set(col, []);
+                                }
+                                selectedCellsByColumn.get(col).push({ cell, row });
+                            });
+                            selectedCellsByColumn.forEach((cells, colIndex) => {
+                                cells.sort((a, b) => a.row - b.row);
+                                if (cells.length > 0) {
+                                    columnValues.set(colIndex, cells[0].cell.querySelector('input').value);
+                                }
+                            });
+                            cellsInSelection.forEach(cell => {
+                                const { col } = getCoords(cell);
+                                if (columnValues.has(col)) {
+                                    cell.querySelector('input').value = columnValues.get(col);
+                                }
+                            });
+                        }
+                    }
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'r'||e.key === 'R')) {
+                    e.preventDefault();
+                    if (selectedCell && tbody.contains(selectedCell)) {
+                        saveState();
+                        const selectedValue = selectedCell.querySelector('input').value;
+                        const selectedCoords = getCoords(selectedCell);
+                        const cellsInSelection = tbody.querySelectorAll('td.selected-range');
+                        if (cellsInSelection.length > 0) {
+                            const selectedRow = selectedCoords.row;           
+                            cellsInSelection.forEach(cell => {
+                                const cellCoords = getCoords(cell);
+                                if (cellCoords.row === selectedRow) {
+                                    cell.querySelector('input').value = selectedValue;
+                                }
+                            });
+                        } else {
+                            const nextCell = getCell(selectedCoords.row, selectedCoords.col + 1);
+                            if (nextCell) {
+                                nextCell.querySelector('input').value = selectedValue;
+                            }
+                        }
+                    }
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'z'||e.key === 'Z')) {
+                    e.preventDefault();
+                    undo();
+                    return;
+                }
+                if (e.ctrlKey && (e.key === 'y'||e.key === 'Y')) {
+                    e.preventDefault();
+                    redo();
+                    return;
+                }
+            });
+            table.addEventListener('focusout', (e) => {
+                const cell = e.target.closest('td');
+                if (cell && tbody.contains(cell) && cell.classList.contains('editing') && !cell.contains(e.relatedTarget)) {
+                    exitEditMode(cell);
+                }
+            }, true);
+        }
+        ['CF', 'BT'].forEach(prefix => {
+            const fileInput = document.getElementById('excelFile' + prefix);
+            const portraitContainer = document.getElementById('portrait-container' + prefix);
+            const landscapeContainer = document.getElementById('landscape-container' + prefix);
+            const templateData = LABEL_TEMPLATES[prefix];
+            const inputTable = document.getElementById(`inputDataTable${prefix}`);
+            const inputTableBody = document.querySelector(`#inputDataTable${prefix} tbody`);
+            const addRow = (tableId) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td style="width: 75px;"><input type="text"></td>
+                    <td style="width: 60px;"><input type="text"></td>
+                    <td style="width: 60px;"><input type="text"></td>
+                    <td style="width: 250px;"><input type="text"></td>
+                    <td style="width: 200px;"><input type="text"></td>
+                    <td style="width: 70px;"><input type="text"></td>
+                    <td style="width: 100px;"><input type="text"></td>
+                    <td style="width: 50px;"><input type="text"></td>
+                    <td style="width: 75px;"><input type="text"></td>
+                    <td style="width: 40px;"><input type="text"></td>
+                    <td style="width: 40px;"><input type="text"></td>
+                    <td style="width: 40px;"><input type="text"></td>
+                `;
+                inputTableBody.appendChild(newRow);
+                setupExcelLikeTable(tableId);
+            };
+            for (let i = 0; i < DEFAULT_ROWS; i++) {
+                addRow(`inputDataTable${prefix}`);
+            }
+            setupExcelLikeTable(`inputDataTable${prefix}`);
+            document.getElementById(`inputBtn${prefix}`).addEventListener('click', () => {
+                currentPrefix = prefix;
+                showPage(pageElements[`${prefix.toLowerCase()}Input`]);
+                const firstCell = document.querySelector(`#inputDataTable${prefix} tbody tr:first-child td:first-child`);
+                if (firstCell) {
+                    firstCell.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                }
+            });
+            document.getElementById(`processInputData${prefix}`).addEventListener('click', () => {
+                processInputData(prefix);
+            });
+            document.getElementById(`clearSheetBtn${prefix}`).addEventListener('click', () => {
+                clearInputTable(prefix);
+            });
+            document.getElementById(`backToImportPageFromInput${prefix}`).addEventListener('click', () => {
+                showPage(pageElements[`${prefix.toLowerCase()}Import`]);
+            });
+            document.getElementById(`backToImportPage${prefix}`).addEventListener('click', () => {
+                showPage(pageElements[`${prefix.toLowerCase()}Import`]);
+            });
+            document.getElementById(`backToLabelTypePage${prefix}`).addEventListener('click', () => {
+                showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
+            });
+            document.getElementById(`backToTypeBtn${prefix}_Portrait`).addEventListener('click', () => {
+                showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+            });
+            document.getElementById(`backToTypeBtn${prefix}_Landscape`).addEventListener('click', () => {
+                showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+            });
+            document.getElementById(`portraitLabelBtn${prefix}`).addEventListener('click', () => {
+                currentLabelOrientation = 'portrait';
+                showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+            });
+            document.getElementById(`landscapeLabelBtn${prefix}`).addEventListener('click', () => {
+                currentLabelOrientation = 'landscape';
+                showPage(pageElements[`${prefix.toLowerCase()}PrintType`]);
+            });
+            document.getElementById(`printWithBorderBtn${prefix}`).addEventListener('click', () => {
+                const templateName = 'label-template';
+                const container = currentLabelOrientation === 'portrait' ? portraitContainer : landscapeContainer;
+                const page = currentLabelOrientation === 'portrait' ? pageElements[`${prefix.toLowerCase()}PortraitPreview`] : pageElements[`${prefix.toLowerCase()}LandscapePreview`];
+                generateLabels(currentLabelsData, container, templateData, `${currentLabelOrientation}-label`, templateName);
+                showPage(page);
+            });
+            document.getElementById(`printWithoutBorderBtn${prefix}`).addEventListener('click', () => {
+                const templateName = 'label-template-no-border';
+                const container = currentLabelOrientation === 'portrait' ? portraitContainer : landscapeContainer;
+                const page = currentLabelOrientation === 'portrait' ? pageElements[`${prefix.toLowerCase()}PortraitPreview`] : pageElements[`${prefix.toLowerCase()}LandscapePreview`];
+                generateLabels(currentLabelsData, container, templateData, `${currentLabelOrientation}-label`, templateName);
+                showPage(page);
+            });
+            inputTable.addEventListener('paste', function(event) {
+                event.preventDefault();
+                const focusedInput = event.target;
+                if (!focusedInput || focusedInput.tagName !== 'INPUT' || !inputTableBody.contains(focusedInput)) {
+                    return;
+                }
+                const clipboardData = event.clipboardData || window.clipboardData;
+                const pastedData = clipboardData.getData('text');
+                const rows = pastedData.split('\n');
+                const startCell = focusedInput.closest('td');
+                const startRow = startCell.closest('tr');
+                let tableRows = inputTableBody.querySelectorAll('tr');
+                const numCols = tableRows.length > 0 ? tableRows[0].querySelectorAll('td').length : 0;
+                const startRowIndex = Array.from(tableRows).indexOf(startRow);
+                const startColIndex = Array.from(startRow.querySelectorAll('td')).indexOf(startCell);
+                rows.forEach((row, rowIndex) => {
+                    const columns = row.split('\t');
+                    columns.forEach((column, colIndex) => {
+                        const targetRowIndex = startRowIndex + rowIndex;
+                        const targetColIndex = startColIndex + colIndex;
+                        while (!tableRows[targetRowIndex]) {
+                            addRow(`inputDataTable${prefix}`);
+                            tableRows = inputTableBody.querySelectorAll('tr');
+                        }
+                        if (tableRows[targetRowIndex] && targetColIndex < numCols) {
+                            const cells = tableRows[targetRowIndex].querySelectorAll('td');
+                            if (cells[targetColIndex]) {
+                                const input = cells[targetColIndex].querySelector('input');
+                                if (input) {
+                                    input.value = column.trim();
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+            fileInput.addEventListener('change', function (e) {
+                hideInlineError(prefix);
+                const file = e.target.files[0];
+                if (!file) return;
+                const fileName = file.name.toLowerCase();
+                const allowedTypes = ['.xlsx', '.xls', '.csv'];
+                const isValid = allowedTypes.some(ext => fileName.endsWith(ext));
+                if (!isValid) {
+                    showInlineError(prefix, "❌ Invalid file type.<br>Please upload a .xlsx, .xls, or .csv file.");
+                    e.target.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    let workbook;
+                    if (fileName.endsWith('.csv')) {
+                        const data = new TextDecoder('utf-8').decode(new Uint8Array(event.target.result));
+                        workbook = XLSX.read(data, { type: 'binary' });
+                    } else {
+                        const data = new Uint8Array(event.target.result);
+                        workbook = XLSX.read(data, { type: 'array' });
+                    }
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rawHeaders = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0].map(h => String(h).trim());
+                    const upperCaseHeaders = rawHeaders.map(h => h.toUpperCase());
+                    const missingHeaders = templateData.headers.filter(h => !upperCaseHeaders.includes(h));
+                    const extraHeaders = upperCaseHeaders.filter(h => !templateData.headers.includes(h));
+                    const lowerCaseIssues = rawHeaders.filter(h => h !== h.toUpperCase() && templateData.headers.includes(h.toUpperCase()));
+                    if (missingHeaders.length > 0 || extraHeaders.length > 0 || lowerCaseIssues.length > 0) {
+                        let msg = "❌ <b>Header validation failed!</b><br><br>";
+                        msg += "✅ <b>Expected Headers:</b> " + templateData.headers.join(", ") + "<br>";
+                        if (missingHeaders.length > 0) {
+                            msg += "🔴 <b>Missing Headers:</b> " + missingHeaders.join(", ") + "<br>";
+                        }
+                        if (extraHeaders.length > 0) {
+                            msg += "🔵 <b>Unexpected Headers:</b> " + extraHeaders.join(", ") + "<br>";
+                        }
+                        if (lowerCaseIssues.length > 0) {
+                            msg += "⚠️ <b>Headers must be in UPPERCASE:</b> " + lowerCaseIssues.join(", ") + "<br>";
+                        }
+                        showInlineError(prefix, msg);
+                        e.target.value = '';
+                        return;
+                    }
+                    currentLabelsData = XLSX.utils.sheet_to_json(sheet);
+                    showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
+                };
+                if (fileName.endsWith('.csv')) {
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+            function generateLabels(dataArray, container, templateData, labelClass, templateId) {
+                const template = document.getElementById(templateId);
+                container.innerHTML = '';
+                dataArray.forEach(data => {
+                    const qty = parseInt(data['QTY'] || 0, 10);
+                    for (let i = 0; i < qty; i++) {
+                        const label = template.content.cloneNode(true).firstElementChild;
+                        label.classList.add(labelClass);
+                        if (templateId === 'label-template-no-border') {
+                            label.querySelector('.label-container').classList.add('no-border');
+                        } else {
+                            label.querySelector('.label-container').classList.remove('no-border');
+                        }
+                        const labelContentWrapper = label.querySelector('.label-content-wrapper');
+                        if (labelClass === 'landscape-label') {
+                            labelContentWrapper.classList.add('rotate-90-left');
+                        } else {
+                            labelContentWrapper.classList.remove('rotate-90-left');
+                        }
+                        const fields = [
+                            { className: 'style', key: 'STYLE CODE' },
+                            { className: 'color', key: 'COLOR' },
+                            { className: 'desc', key: 'DESCRIPTION' },
+                            { className: 'size', key: 'SIZE' },
+                            { className: 'qty', key: 'NOS' },
+                            { className: 'pkd', key: 'PKD' }
+                        ];
+                        fields.forEach(f => {
+                            const el = label.querySelector(`.${f.className}`);
+                            if (!el) return;
+                            let val = data[f.key];
+                            const dataText = el.querySelector('.data-bold');
+                            if (val !== undefined && val !== null && String(val).trim() !== '') {
+                                if (f.className === 'color') {
+                                    const colorStr = String(val).trim();
+                                    if (colorStr.length > 14) {
+                                        const firstSlashIndex = colorStr.indexOf('/');
+                                        const firstUnderscoreIndex = colorStr.indexOf('_');
+                                        let firstDelimiterIndex = -1;
+                                        if (firstSlashIndex !== -1 && (firstUnderscoreIndex === -1 || firstSlashIndex < firstUnderscoreIndex)) {
+                                            firstDelimiterIndex = firstSlashIndex;
+                                        } else if (firstUnderscoreIndex !== -1) {
+                                            firstDelimiterIndex = firstUnderscoreIndex;
+                                        }
+                                        let secondDelimiterIndex = -1;
+                                        if (firstDelimiterIndex !== -1) {
+                                            const secondSlashIndex = colorStr.indexOf('/', firstDelimiterIndex + 1);
+                                            const secondUnderscoreIndex = colorStr.indexOf('_', firstDelimiterIndex + 1);
+                                            if (secondSlashIndex !== -1 && (secondUnderscoreIndex === -1 || secondSlashIndex < secondUnderscoreIndex)) {
+                                                secondDelimiterIndex = secondSlashIndex;
+                                            } else if (secondUnderscoreIndex !== -1) {
+                                                secondDelimiterIndex = secondUnderscoreIndex;
+                                            }
+                                        }
+                                        if (firstDelimiterIndex !== -1 && secondDelimiterIndex === -1) {
+                                            const first = colorStr.substring(0, firstDelimiterIndex)?.trim() || '';
+                                            const second = colorStr.substring(firstDelimiterIndex).trim() || '';
+                                            if (dataText) {
+                                                dataText.innerHTML = `<span class="color-bold">${first}</span><br><span class="color-bold">${second}</span>`;
+                                            }
+                                        } else if (secondDelimiterIndex !== -1) {
+                                            const first = colorStr.substring(0, secondDelimiterIndex)?.trim() || '';
+                                            const second = colorStr.substring(secondDelimiterIndex).trim() || '';
+                                            if (dataText) {
+                                                dataText.innerHTML = `<span class="color-bold">${first}</span><br><span class="color-bold">${second}</span>`;
+                                            }
+                                        } else {
+                                            if (dataText) {
+                                                dataText.textContent = val;
+                                            }
+                                        }
+                                    } else {
+                                        if (dataText) {
+                                            dataText.textContent = val;
+                                        }
+                                    }
+                                } else if (f.key === 'PKD') {
+                                    let formattedDate = '';
+                                    if (typeof val === 'number') {
+                                        const excelEpoch = new Date(1899, 11, 30);
+                                        const parsedDate = new Date(excelEpoch.getTime() + val * 86400000);
+                                        formattedDate = `${String(parsedDate.getMonth() + 1).padStart(2, '0')}/${parsedDate.getFullYear()}`;
+                                    } else if (typeof val === 'string' && /^\d{1,2}\/\d{4}$/.test(val.trim())) {
+                                        const [month, year] = val.split('/');
+                                        formattedDate = `${month.padStart(2, '0')}/${year}`;
+                                    } else {
+                                        const parsed = new Date(val);
+                                        if (!isNaN(parsed)) {
+                                            formattedDate = `${String(parsed.getMonth() + 1).padStart(2, '0')}/${parsed.getFullYear()}`;
+                                        } else {
+                                            formattedDate = val || '';
+                                        }
+                                    }
+                                    dataText.textContent = formattedDate;
+                                } else {
+                                    dataText.textContent = val;
+                                    if (f.key === 'DESCRIPTION') {
+                                        if (String(val).length > 16) {
+                                            dataText.style.fontSize = '6px';
+                                        } else if (String(val).length > 15) {
+                                            dataText.style.fontSize = '6.5px';
+                                        } else if (String(val).length > 14) {
+                                            dataText.style.fontSize = '7px';
+                                        } else if (String(val).length > 13) {
+                                            dataText.style.fontSize = '7.25px';
+                                        } else {
+                                            dataText.style.fontSize = '8px';
+                                        }
+                                    }
+                                }
+                            } else {
+                                el.remove();
+                            }
+                        });
+                        const fitBatchRow = label.querySelector('.fit-batch');
+                        const fitDataCell = fitBatchRow.querySelector('.fit-data');
+                        const batchDataCell = fitBatchRow.querySelector('.batch-data');
+                        const fitVal = data['FIT'];
+                        const batchVal = data['BATCH'];
+                        const hasFit = fitVal !== undefined && fitVal !== null && String(fitVal).trim() !== '';
+                        const hasBatch = batchVal !== undefined && batchVal !== null && String(batchVal).trim() !== '';
+                        if (hasFit || hasBatch) {
+                            fitDataCell.textContent = hasFit ? String(fitVal).trim() : '';
+                            batchDataCell.textContent = hasBatch ? String(batchVal).trim() : '';
+                            if (hasFit && hasBatch) {
+                                fitDataCell.colSpan = 2;
+                                batchDataCell.colSpan = 2;
+                            } else if (hasFit) {
+                                fitDataCell.colSpan = 4;
+                                batchDataCell.style.display = 'none';
+                            } else if (hasBatch) {
+                                batchDataCell.colSpan = 4;
+                                fitDataCell.style.display = 'none';
+                            }
+                            fitBatchRow.style.display = '';
+                        } else {
+                            fitBatchRow.style.display = 'none';
+                        }
+                        const barcode = label.querySelector('.barcode');
+                        const rawBarcode = String(data['EAN'] || '0000000000000').trim();
+                        setTimeout(() => {
+                            if (barcode) {
+                                JsBarcode(barcode, rawBarcode, {
+                                    format: "CODE128",
+                                    width: 1,
+                                    height: 12,
+                                    fontSize: 10,
+                                    textMargin: 0,
+                                    margin: 0,
+                                    fontOptions: "bold",
+                                    displayValue: true
+                                });
+                            }
+                        }, 0);
+                        const mrpEl = label.querySelector('.mrp');
+                        if (mrpEl) {
+                            mrpEl.innerHTML = `MRP ₹ <span class="data-bold">${data['MRP'] || '0.00'}</span><small>(Inclusive of all taxes)</small>`;
+                        }
+                        const vcodeCircle = label.querySelector('.vcode-circle');
+                        if (vcodeCircle) {
+                            vcodeCircle.textContent = data['VCODE'] || '';
+                        }
+                        const addressEl = label.querySelector('.address-content');
+                        if (addressEl) addressEl.innerHTML = templateData.address.join("<br>");
+                        const contactEl = label.querySelector('.contact-content');
+                        if (contactEl) contactEl.textContent = templateData.contact;
+                        container.appendChild(label);
+                    }
+                });
+            }
+            document.getElementById(`printPortraitPdfBtn${prefix}`).addEventListener('click', () => {
+                const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-portrait-preview-page`);
+                currentPreviewPage.classList.add('pdf-print-mode', 'portrait-print-mode', 'print-active');
+                window.print();
+                currentPreviewPage.classList.remove('pdf-print-mode', 'portrait-print-mode', 'print-active');
+            });
+            document.getElementById(`printPortraitTscBtn${prefix}`).addEventListener('click', () => {
+                const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-portrait-preview-page`);
+                currentPreviewPage.classList.add('tsc-print-mode', 'portrait-print-mode', 'print-active');
+                window.print();
+                currentPreviewPage.classList.remove('tsc-print-mode', 'portrait-print-mode', 'print-active');
+            });
+            document.getElementById(`printLandscapePdfBtn${prefix}`).addEventListener('click', () => {
+                const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-landscape-preview-page`);
+                currentPreviewPage.classList.add('pdf-print-mode', 'landscape-print-mode', 'print-active');
+                window.print();
+                currentPreviewPage.classList.remove('pdf-print-mode', 'landscape-print-mode', 'print-active');
+            });
+            document.getElementById(`printLandscapeTscBtn${prefix}`).addEventListener('click', () => {
+                const currentPreviewPage = document.getElementById(`${prefix.toLowerCase()}mrp-landscape-preview-page`);
+                currentPreviewPage.classList.add('tsc-print-mode', 'landscape-print-mode', 'print-active');
+                window.print();
+                currentPreviewPage.classList.remove('tsc-print-mode', 'landscape-print-mode', 'print-active');
+            });
+        });
+        function processInputData(prefix) {
+            const tableBody = document.querySelector(`#inputDataTable${prefix} tbody`);
+            const rows = tableBody.querySelectorAll('tr');
+            const data = [];
+            const headers = [
+                "STYLE CODE", "SIZE", "MRP", "COLOR", "DESCRIPTION", "PKD",
+                "EAN", "BATCH", "FIT", "QTY", "NOS", "VCODE"
+            ];
+            rows.forEach(row => {
+                const rowData = {};
+                let isEmptyRow = true;
+                row.querySelectorAll('input').forEach((input, index) => {
+                    const header = headers[index];
+                    if (header.toLowerCase() === 'NOS') {
+                        return;
+                    }
+                    const value = input.value.trim();
+                    rowData[header] = value;
+                    if (value !== '') {
+                        isEmptyRow = false;
+                    }
+                });
+                if (!isEmptyRow) {
+                    data.push(rowData);
+                }
+            });
+            if (data.length === 0) {
+                showInlineError(prefix, "❌ No data entered.<br>Please enter at least one row of data.");
+                return;
+            }
+            currentLabelsData = data;
+            showPage(pageElements[`${prefix.toLowerCase()}LabelType`]);
+        }
+        function clearInputTable(prefix) {
+            const tableBody = document.querySelector(`#inputDataTable${prefix} tbody`);
+            tableBody.querySelectorAll('input').forEach(input => {
+                input.value = '';
+            });
+            while (tableBody.rows.length < DEFAULT_ROWS) {
+                addRow(`inputDataTable${prefix}`);
+            }
+            while (tableBody.rows.length > DEFAULT_ROWS) {
+                tableBody.deleteRow(-1);
+            }
+        }
+    });
+    </script>
+</body>
+</html>
